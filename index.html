@@ -24,7 +24,6 @@
             background: url('bg.jpg');
             background-size: cover;
             max-width: 800px;
-        
             margin: auto;
             padding: 20px;
             position: relative;
@@ -104,9 +103,6 @@
         }
 
         /* Typing animation */
-        
-
-        /* Typing effect */
         @keyframes typing {
             from {
                 width: 0;
@@ -159,7 +155,18 @@
     </center>
 
     <script>
+        // Shuffle the names array to randomize the order
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         const names = Array.from({ length: 180 }, (_, i) => `Name ${i + 1}`);
+        const shuffledNames = shuffleArray(names); // Shuffle the names array
+
         const colors = ["#0ff", "#f00", "#0f0"];
         const namesContainer = document.querySelector(".names-container");
         const mappedInfo = document.querySelector(".mapped-info");
@@ -168,8 +175,8 @@
 
         // Grid-based tracking for non-overlapping placement
         const gridSize = 10; // Smaller grid = more precise
-        const grid = Array.from({ length: namesContainer.clientWidth / gridSize }, () =>
-            Array(namesContainer.clientHeight / gridSize).fill(false)
+        const grid = Array.from({ length: Math.ceil(namesContainer.clientWidth / gridSize) }, () =>
+            Array(Math.ceil(namesContainer.clientHeight / gridSize)).fill(false)
         );
 
         function getRandom(min, max) {
@@ -204,7 +211,7 @@
         }
 
         function placeNames() {
-            names.forEach((name, index) => {
+            shuffledNames.forEach((name, index) => {
                 setTimeout(() => {
                     const span = document.createElement("span");
                     span.classList.add("name");
@@ -216,15 +223,17 @@
 
                     let width = span.offsetWidth;
                     let height = span.offsetHeight;
-                    let left, top, attempts = 0;
+                    let left, top;
 
+                    // Try to place the name in a non-overlapping position
+                    let attempts = 0;
                     do {
                         left = getRandom(10, namesContainer.clientWidth - width - 10);
                         top = getRandom(10, namesContainer.clientHeight - height - 10);
                         attempts++;
-                    } while (isOverlapping(left, top, width, height) && attempts < 100);
+                    } while (isOverlapping(left, top, width, height) && attempts < 500); // Increase attempts limit
 
-                    if (attempts < 100) {
+                    if (!isOverlapping(left, top, width, height)) {
                         span.style.left = `${left}px`;
                         span.style.top = `${top}px`;
                         markGrid(left, top, width, height);
