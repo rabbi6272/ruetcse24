@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE-24 | RUET</title>
+    <style>
+        @font-face {
+            font-family: "sub";
+            src: url("AnonymousPro-Regular.ttf");
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            color: black;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: url('bg.jpg');
+            background-size: cover;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+
+        .title {
+            font-size: 60px;
+            font-family: "sub";
+            font-weight: bolder;
+            position: relative;
+            z-index: 2;
+        }
+
+        .pp {
+            font-family: "sub";
+            position: relative;
+            z-index: 2;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            margin-top: 10px;
+            font-family: "sub";
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Names container */
+        .names-container {
+            background: #333;
+            max-width: 800px;
+            height: 400px;
+            margin: 20px auto;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Name styling */
+        .name {
+            position: absolute;
+            font-family: "sub";
+            font-weight: bold;
+            opacity: 0.8;
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px currentColor;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="l.png" alt="RUET Logo" class="logo">
+        <h3 class="pp">Rajshahi University of Engineering and Technology RUET 24-25</h3>
+        <h1 class="title">CSE-24</h1>
+        <p class="subtitle">
+            "Through logic and innovation, we turn ideas into reality. 
+            From groundbreaking code to intelligent systems – 
+            we shape the world of tomorrow."
+        </p>
+    </div>
+
+    <div class="names-container"></div>
+
+    <script>
+        const names = Array.from({ length: 180 }, (_, i) => `Name ${i + 1}`);
+        const colors = ["#0ff", "#f00", "#0f0"];
+        const namesContainer = document.querySelector(".names-container");
+
+        // Grid-based tracking for non-overlapping placement
+        const gridSize = 10; // Smaller grid = more precise
+        const grid = Array.from({ length: namesContainer.clientWidth / gridSize }, () =>
+            Array(namesContainer.clientHeight / gridSize).fill(false)
+        );
+
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function isOverlapping(left, top, width, height) {
+            const startX = Math.floor(left / gridSize);
+            const startY = Math.floor(top / gridSize);
+            const endX = Math.floor((left + width) / gridSize);
+            const endY = Math.floor((top + height) / gridSize);
+
+            for (let x = startX; x <= endX; x++) {
+                for (let y = startY; y <= endY; y++) {
+                    if (grid[x] && grid[x][y]) return true;
+                }
+            }
+            return false;
+        }
+
+        function markGrid(left, top, width, height) {
+            const startX = Math.floor(left / gridSize);
+            const startY = Math.floor(top / gridSize);
+            const endX = Math.floor((left + width) / gridSize);
+            const endY = Math.floor((top + height) / gridSize);
+
+            for (let x = startX; x <= endX; x++) {
+                for (let y = startY; y <= endY; y++) {
+                    if (grid[x]) grid[x][y] = true;
+                }
+            }
+        }
+
+        function placeNames() {
+            names.forEach((name, index) => {
+                setTimeout(() => {
+                    const span = document.createElement("span");
+                    span.classList.add("name");
+                    span.textContent = name;
+                    span.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    span.style.fontSize = `${getRandom(14, 28)}px`;
+
+                    namesContainer.appendChild(span);
+
+                    let width = span.offsetWidth;
+                    let height = span.offsetHeight;
+                    let left, top, attempts = 0;
+
+                    do {
+                        left = getRandom(10, namesContainer.clientWidth - width - 10);
+                        top = getRandom(10, namesContainer.clientHeight - height - 10);
+                        attempts++;
+                    } while (isOverlapping(left, top, width, height) && attempts < 100);
+
+                    if (attempts < 100) {
+                        span.style.left = `${left}px`;
+                        span.style.top = `${top}px`;
+                        markGrid(left, top, width, height);
+                    } else {
+                        span.remove(); // Remove if no space is found after many attempts
+                    }
+
+                }, index * 50);
+            });
+        }
+
+        placeNames();
+    </script>
+
+</body>
+</html>
