@@ -62,8 +62,8 @@
         /* Names container */
         .names-container {
             background: #333;
-            max-width: 800px;
-            height: 400px;
+            max-width: 1000px;
+            height: 600px;
             margin: 20px auto;
             position: relative;
             border-radius: 10px;
@@ -193,7 +193,7 @@
         let mappedCount = 0;
 
         // Grid-based tracking for non-overlapping placement
-        const gridSize = 10; // Smaller grid = more precise
+        const gridSize = 1; // Smaller grid = more precise
         const grid = Array.from({ length: Math.ceil(namesContainer.clientWidth / gridSize) }, () =>
             Array(Math.ceil(namesContainer.clientHeight / gridSize)).fill(false)
         );
@@ -236,7 +236,7 @@
                     span.classList.add("name");
                     span.textContent = name;
                     span.style.color = colors[Math.floor(Math.random() * colors.length)];
-                    span.style.fontSize = `${getRandom(14, 28)}px`;
+                    span.style.fontSize = `${getRandom(12, 24)}px`;
 
                     namesContainer.appendChild(span);
 
@@ -295,6 +295,6 @@
         placeNames();
     </script>
 <br>
-<i>Special Thanks to</i> <a href="https://www.facebook.com/labib.mahi.306210">Labib Mahi</a>
+<i>Special Thanks to</i> <a href="https://www.facebook.com/labib.mahi.306210">Labib Rahi</a>
 </body>
 </html>
