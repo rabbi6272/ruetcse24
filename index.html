@@ -43,6 +43,7 @@
             font-weight: bolder;
             position: relative;
             z-index: 2;
+            height:50px;
         }
 
         .pp {
@@ -129,14 +130,15 @@
     <div class="container">
         <img src="l.png" alt="RUET Logo" class="logo">
         <h3 class="pp">Rajshahi University of Engineering and Technology RUET 24-25</h3>
-         <p class="subtitle">
+       
+        <h1 class="title">
+            <span id="typingText" class="typing"></span>
+        </h1>
+          <p class="subtitle">
             "Through logic and innovation, we turn ideas into reality.
             From groundbreaking code to intelligent systems –
             we shape the world of tomorrow."
         </p>
-        <h1 class="title">
-            <span id="typingText" class="typing"></span>
-        </h1>
        
     </div>
     <center>
@@ -239,7 +241,7 @@
         // Typing animation for the header text
         function typeText() {
             const textElement = document.getElementById('typingText');
-            const texts = ["CSE'24", "...", "we","Don't","fix","computers",":)))"];
+            const texts = ["CSE'24", "...", "we","Don't","fix","computers",":)"];
             let textIndex = 0;
             let charIndex = 0;
 
