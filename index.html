@@ -77,8 +77,7 @@
             font-family: "sub";
             font-weight: bold;
             opacity: 0.8;
-            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px currentColor;
-            pointer-events: none;
+             pointer-events: none;
             white-space: nowrap;
             animation: fadeIn 1s ease-in-out forwards;
         }
@@ -186,7 +185,8 @@
 ]
         const shuffledNames = shuffleArray(names); // Shuffle the names array
 
-        const colors = ["#0ff", "#f00", "#0f0"];
+        //const colors = ["#0ff", "#f00", "#0f0"];
+        const colors = ["#FFD700", "#00FFFF", "#FF69B4", "#7FFF00", "#FF4500"]; // Gold, Cyan, Hot Pink, Chartreuse, Orange Red
         const namesContainer = document.querySelector(".names-container");
         const mappedInfo = document.querySelector(".mapped-info");
 
