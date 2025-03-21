@@ -7,12 +7,12 @@
     <style>
         @font-face {
             font-family: "sub";
-            src: url("./AnonymousPro-Regular.ttf");
+            src: url("AnonymousPro-Regular.ttf");
         }
-*{
-font-family:"sub";
-    
-}
+        * {
+            font-family: "sub";
+        }
+
         body {
             text-align: center;
             padding: 50px;
@@ -24,6 +24,7 @@ font-family:"sub";
             background: url('bg.jpg');
             background-size: cover;
             max-width: 800px;
+            height:300px;
             margin: auto;
             padding: 20px;
             position: relative;
@@ -93,6 +94,34 @@ font-family:"sub";
                 transform: scale(1);
             }
         }
+
+        .mapped-info {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00f;
+        }
+
+        /* Typing animation */
+        
+
+        /* Typing effect */
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        /* Cursor blink */
+        @keyframes blink {
+            50% {
+                border-color: transparent;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -100,20 +129,40 @@ font-family:"sub";
     <div class="container">
         <img src="l.png" alt="RUET Logo" class="logo">
         <h3 class="pp">Rajshahi University of Engineering and Technology RUET 24-25</h3>
-        <h1 class="title">CSE-24</h1>
-        <p class="subtitle">
-            "Through logic and innovation, we turn ideas into reality. 
-            From groundbreaking code to intelligent systems – 
+         <p class="subtitle">
+            "Through logic and innovation, we turn ideas into reality.
+            From groundbreaking code to intelligent systems –
             we shape the world of tomorrow."
         </p>
+        <h1 class="title">
+            <span id="typingText" class="typing"></span>
+        </h1>
+       
     </div>
+    <center>
+        <h3>
+            Powered By
+        </h3>
+    </center>
 
     <div class="names-container"></div>
+    <div class="mapped-info">Mapped: 0</div>
+
+    <small>All names cannot be mapped at the same time because of screen width, refresh the page for updated appearance.</small>
+
+    <center>
+        <h4>
+            All rights reserved by cse(24-25) RUET
+        </h4>
+    </center>
 
     <script>
         const names = Array.from({ length: 180 }, (_, i) => `Name ${i + 1}`);
         const colors = ["#0ff", "#f00", "#0f0"];
         const namesContainer = document.querySelector(".names-container");
+        const mappedInfo = document.querySelector(".mapped-info");
+
+        let mappedCount = 0;
 
         // Grid-based tracking for non-overlapping placement
         const gridSize = 10; // Smaller grid = more precise
@@ -177,6 +226,8 @@ font-family:"sub";
                         span.style.left = `${left}px`;
                         span.style.top = `${top}px`;
                         markGrid(left, top, width, height);
+                        mappedCount++;
+                        mappedInfo.textContent = `Mapped: ${mappedCount}`;
                     } else {
                         span.remove(); // Remove if no space is found after many attempts
                     }
@@ -185,6 +236,32 @@ font-family:"sub";
             });
         }
 
+        // Typing animation for the header text
+        function typeText() {
+            const textElement = document.getElementById('typingText');
+            const texts = ["CSE'24", "...", "we","Don't","fix","computers",":)))"];
+            let textIndex = 0;
+            let charIndex = 0;
+
+            function type() {
+                if (charIndex < texts[textIndex].length) {
+                    textElement.textContent += texts[textIndex][charIndex];
+                    charIndex++;
+                    setTimeout(type, 150); // typing speed
+                } else {
+                    setTimeout(() => {
+                        textElement.textContent = ''; // erase text
+                        textIndex = (textIndex + 1) % texts.length; // cycle through texts
+                        charIndex = 0;
+                        setTimeout(type, 500); // wait before starting to type again
+                    }, 1000); // wait after typing is complete
+                }
+            }
+
+            type();
+        }
+
+        typeText();
         placeNames();
     </script>
 
