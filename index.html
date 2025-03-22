@@ -23,21 +23,21 @@
         .container {
             background: url('bg.jpg');
             background-size: cover;
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
+            width:100%;
+            
+            padding:10px;
             position: relative;
-            border-radius: 10px;
+            border-radius: 2px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         .logo {
-            width: 100px;
+            width: 150px;
             height: auto;
         }
 
         .title {
-            font-size: 60px;
+            font-size: 50px;
             font-family: "sub";
             font-weight: bolder;
             position: relative;
@@ -121,14 +121,17 @@
     </style>
 </head>
 <body>
-
+  
     <div class="container">
         <img src="l.png" alt="RUET Logo" class="logo">
         <h3 class="pp">Rajshahi University of Engineering and Technology RUET 24-25</h3>
        
-        <h1 class="title">
+       
+        <h1 class="title" data-value="CSE-24">CSE-24</h1> 
+       
+        <h3 >
             <span id="typingText" class="typing"></span>
-        </h1>
+        </h3>
           <p class="subtitle">
             "Through logic and innovation, we turn ideas into reality.
             From groundbreaking code to intelligent systems –
@@ -425,33 +428,71 @@
         }
 
         // Typing animation for the header text
-        function typeText() {
-            const textElement = document.getElementById('typingText');
-            const texts = ["CSE'24", "...", "we","Don't","fix","computers",":)"];
-            let textIndex = 0;
-            let charIndex = 0;
+        
+        placeNames();
+        
+        
+        
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#@&?!"; // Added more characters
 
-            function type() {
-                if (charIndex < texts[textIndex].length) {
-                    textElement.textContent += texts[textIndex][charIndex];
-                    charIndex++;
-                    setTimeout(type, 150); // typing speed
-                } else {
-                    setTimeout(() => {
-                        textElement.textContent = ''; // erase text
-                        textIndex = (textIndex + 1) % texts.length; // cycle through texts
-                        charIndex = 0;
-                        setTimeout(type, 500); // wait before starting to type again
-                    }, 1000); // wait after typing is complete
-                }
-            }
+    let interval = null;
 
-            type();
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    hackedText = async () => {
+      let iteration = 0;
+      let pass = 0;
+      const target = document.querySelector("h1");
+      clearInterval(interval);
+
+      const targetLength = target.dataset.value.length;
+      const originalText = target.dataset.value;
+      target.innerText = `_`;
+      target.classList.add("blinking-cursor");
+      await sleep(2000);
+      target.classList.remove("blinking-cursor");
+      target.innerHTML = "";
+
+      const randomLetter = () => letters[Math.floor(Math.random() * letters.length)]; // Updated to use the new letters string
+      interval = setInterval(() => {
+        if (pass == 0) {
+          // Writeout
+          target.innerText =
+            target.innerText.split("").map(randomLetter).join("") + randomLetter();
+          iteration += 1;
+        }
+        if (pass == 1) {
+          // Descramble
+          target.innerText = target.innerText
+            .split("")
+            .map((letter, index) => {
+              if (index <= iteration) {
+                return target.dataset.value[index];
+              }
+
+              return randomLetter();
+            })
+            .join("");
+          iteration += 1 / 3;
+        } else if (pass == 2) {
+          // Finish
+          clearInterval(interval);
         }
 
-        typeText();
-        placeNames();
+        if (iteration == targetLength) {
+          // After we've iterated through the text
+          pass += 1;
+          iteration = 0;
+        }
+      }, 100); // Increased interval time to slow down the animation
+    };
+
+    window.addEventListener("load", hackedText);
+        
+        
+        
     </script>
+   
 <br>
 <i>Special Thanks to</i> <a href="https://www.facebook.com/labib.mahi.306210">Labib Mahi</a>
     <center>
