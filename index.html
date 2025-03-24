@@ -198,12 +198,12 @@
        <center>
     <ul>
       <li><span id="likeCount">0</span> Likes </li>
-      <li><span id="unlikeCount">0</span> Unlikes</li>
+      <li><span id="unlikeCount">0</span> Dislikes</li>
       <li><span id="viewsCount">0</span> Views</li>
     </ul>
        </center>
      <button id="likeBtn">Like</button>
-      <button id="unlikeBtn">Unlike</button>
+      <button id="unlikeBtn">Dislike</button>
   </div>
 
     <script>
@@ -592,7 +592,7 @@
     if (hasUnliked) {
       likeBtn.disabled = true;
       unlikeBtn.disabled = true;
-      unlikeBtn.innerHTML ="already unliked ToT"
+      unlikeBtn.innerHTML ="already disliked ToT"
     }
 
     // Fetch initial counts from Firebase
