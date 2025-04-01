@@ -407,7 +407,7 @@
 
 
 
-
+/*
 
         document.addEventListener('contextmenu', (event) => event.preventDefault());
 
@@ -443,7 +443,48 @@ setInterval(() => {
     console.log = console.warn = console.error = () => {};
   }
 }, 1000);
-        
+        */
+
+
+        function protectPage() {
+  // Disable right-click context menu
+  document.addEventListener('contextmenu', (event) => event.preventDefault());
+
+  // Disable text selection
+  document.addEventListener('selectstart', (event) => event.preventDefault());
+
+  // Disable common DevTools shortcuts
+  document.addEventListener('keydown', (event) => {
+    if (
+      event.key === "F12" ||
+      (event.ctrlKey && event.shiftKey && ["I", "J", "C"].includes(event.key)) ||
+      (event.ctrlKey && event.key === "U")
+    ) {
+      event.preventDefault();
+    }
+  }, false);
+
+  // DevTools detection
+  const element = new Image();
+  Object.defineProperty(element, 'id', {
+    get: function() {
+      alert("DevTools detected! Please close it.");
+      window.location.reload();
+    }
+  });
+  console.log("%c", element);
+
+  // Disable console functions
+  if (window.console) {
+    console.log = console.warn = console.error = () => {};
+  }
+}
+
+// Run immediately
+protectPage();
+
+// Run every second
+setInterval(protectPage, 1000);
     </script>
    
 <br>
