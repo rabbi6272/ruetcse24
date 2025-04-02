@@ -196,14 +196,9 @@
 
      <div>
        <center>
-    <ul>
-      <li><span id="likeCount">0</span> Likes </li>
-      <li><span id="unlikeCount">0</span> Dislikes</li>
-      <li><span id="viewsCount">0</span> Views</li>
-    </ul>
+         
        </center>
-     <button id="likeBtn">Like</button>
-      <button id="unlikeBtn">Dislike</button>
+    
   </div>
 
     <script>
@@ -398,287 +393,7 @@
   "RATUL",
   "BAISHAKHY"
 ]
-        const shuffledNames = shuffleArray(names); // Shuffle the names array
-
-        //const colors = ["#0ff", "#f00", "#0f0"];
-        const colors = ["#FFD700", "#00FFFF", "#FF69B4", "#7FFF00", "#FF4500"]; // Gold, Cyan, Hot Pink, Chartreuse, Orange Red
-        const namesContainer = document.querySelector(".names-container");
-        const mappedInfo = document.querySelector(".mapped-info");
-
-        let mappedCount = 0;
-
-        // Grid-based tracking for non-overlapping placement
-        const gridSize = 1; // Smaller grid = more precise
-        const grid = Array.from({ length: Math.ceil(namesContainer.clientWidth / gridSize) }, () =>
-            Array(Math.ceil(namesContainer.clientHeight / gridSize)).fill(false)
-        );
-
-        function getRandom(min, max) {
-            return Math.random() * (max - min) + min;
-        }
-
-        function isOverlapping(left, top, width, height) {
-            const startX = Math.floor(left / gridSize);
-            const startY = Math.floor(top / gridSize);
-            const endX = Math.floor((left + width) / gridSize);
-            const endY = Math.floor((top + height) / gridSize);
-
-            for (let x = startX; x <= endX; x++) {
-                for (let y = startY; y <= endY; y++) {
-                    if (grid[x] && grid[x][y]) return true;
-                }
-            }
-            return false;
-        }
-
-        function markGrid(left, top, width, height) {
-            const startX = Math.floor(left / gridSize);
-            const startY = Math.floor(top / gridSize);
-            const endX = Math.floor((left + width) / gridSize);
-            const endY = Math.floor((top + height) / gridSize);
-
-            for (let x = startX; x <= endX; x++) {
-                for (let y = startY; y <= endY; y++) {
-                    if (grid[x]) grid[x][y] = true;
-                }
-            }
-        }
-
-        function placeNames() {
-            shuffledNames.forEach((name, index) => {
-                setTimeout(() => {
-                    const span = document.createElement("span");
-                    span.classList.add("name");
-                    span.textContent = name.toUpperCase();
-                    span.style.color = colors[Math.floor(Math.random() * colors.length)];
-                    span.style.fontSize = `${getRandom(12, 24)}px`;
-
-                    namesContainer.appendChild(span);
-
-                    let width = span.offsetWidth;
-                    let height = span.offsetHeight;
-                    let left, top;
-
-                    // Try to place the name in a non-overlapping position
-                    let attempts = 0;
-                    do {
-                        left = getRandom(10, namesContainer.clientWidth - width - 10);
-                        top = getRandom(10, namesContainer.clientHeight - height - 10);
-                        attempts++;
-                    } while (isOverlapping(left, top, width, height) && attempts < 500); // Increase attempts limit
-
-                    if (!isOverlapping(left, top, width, height)) {
-                        span.style.left = `${left}px`;
-                        span.style.top = `${top}px`;
-                        markGrid(left, top, width, height);
-                        mappedCount++;
-                        mappedInfo.textContent = `Mapped: ${mappedCount}`;
-                    } else {
-                        span.remove(); // Remove if no space is found after many attempts
-                    }
-
-                }, index * 50);
-            });
-        }
-
-        // Typing animation for the header text
-        
-        placeNames();
-        
-        
-        
-        
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#@&?!-_.;:'*%^~=><;π√{}[]ηθοβωψςδαημεργφνζ" 
-    let interval = null;
-
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-    hackedText = async () => {
-      let iteration = 0;
-      let pass = 0;
-      const target = document.querySelector("h1");
-      clearInterval(interval);
-
-      const targetLength = target.dataset.value.length;
-      const originalText = target.dataset.value;
-      target.innerText = `_`;
-      target.classList.add("blinking-cursor");
-      await sleep(2000);
-      target.classList.remove("blinking-cursor");
-      target.innerHTML = "";
-
-      const randomLetter = () => letters[Math.floor(Math.random() * letters.length)]; // Updated to use the new letters string
-      interval = setInterval(() => {
-        if (pass == 0) {
-          // Writeout
-          target.innerText =
-            target.innerText.split("").map(randomLetter).join("") + randomLetter();
-          iteration += 1;
-        }
-        if (pass == 1) {
-          // Descramble
-          target.innerText = target.innerText
-            .split("")
-            .map((letter, index) => {
-              if (index <= iteration) {
-                return target.dataset.value[index];
-              }
-
-              return randomLetter();
-            })
-            .join("");
-          iteration += 1 / 3;
-        } else if (pass == 2) {
-          // Finish
-          clearInterval(interval);
-        }
-
-        if (iteration == targetLength) {
-          // After we've iterated through the text
-          pass += 1;
-          iteration = 0;
-        }
-      }, 100); // Increased interval time to slow down the animation
-    };
-
-    window.addEventListener("load", hackedText);
-        
-        
-        
-        const firebaseConfig = {
-  apiKey: "AIzaSyAov5QhTpQ_1svMOFgWsg3E8tRalKrbs2U",
-  authDomain: "last-197cd.firebaseapp.com",
-  databaseURL: "https://last-197cd-default-rtdb.firebaseio.com",
-  projectId: "last-197cd",
-  storageBucket: "last-197cd.appspot.com",
-  messagingSenderId: "176790808601",
-  appId: "1:176790808601:web:af5bbe0fee206d74b86288",
-  measurementId: "G-JPSKNHEVJT"
-};
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // DOM elements
-    const likeCountElem = document.getElementById('likeCount');
-    const unlikeCountElem = document.getElementById('unlikeCount');
-    const viewsCountElem = document.getElementById('viewsCount');
-    const likeBtn = document.getElementById('likeBtn');
-    const unlikeBtn = document.getElementById('unlikeBtn');
-    const viewsBtn = document.getElementById('viewsBtn');
-
-    // Firebase references
-    const likeRef = database.ref('counters/like');
-    const unlikeRef = database.ref('counters/unlike');
-    const viewsRef = database.ref('counters/views');
-
-    // LocalStorage keys
-    const LOCAL_STORAGE_LIKE_KEY = 'hasLiked';
-    const LOCAL_STORAGE_UNLIKE_KEY = 'hasUnliked';
-    const LOCAL_STORAGE_VIEW_KEY = 'hasViewed';
-
-    // Check if user has already liked, unliked, or viewed
-    const hasLiked = localStorage.getItem(LOCAL_STORAGE_LIKE_KEY) === 'true';
-    const hasUnliked = localStorage.getItem(LOCAL_STORAGE_UNLIKE_KEY) === 'true';
-    const hasViewed = localStorage.getItem(LOCAL_STORAGE_VIEW_KEY) === 'true';
-
-    // Disable buttons if already interacted
-    if (hasLiked) {
-      likeBtn.disabled = true;
-      unlikeBtn.disabled = true;
-      likeBtn.innerHTML ="already liked <3"
-    }
-    if (hasUnliked) {
-      likeBtn.disabled = true;
-      unlikeBtn.disabled = true;
-      unlikeBtn.innerHTML ="already disliked ToT"
-    }
-
-    // Fetch initial counts from Firebase
-    likeRef.on('value', (snapshot) => {
-      likeCountElem.textContent = snapshot.val() || 0;
-    });
-    unlikeRef.on('value', (snapshot) => {
-      unlikeCountElem.textContent = snapshot.val() || 0;
-    });
-    viewsRef.on('value', (snapshot) => {
-      viewsCountElem.textContent = snapshot.val() || 0;
-    });
-
-    // Increment like count
-    likeBtn.addEventListener('click', () => {
-      likeRef.transaction((count) => (count || 0) + 1);
-      localStorage.setItem(LOCAL_STORAGE_LIKE_KEY, 'true');
-      likeBtn.disabled = true;
-      unlikeBtn.disabled = true;
-      animateCounter(likeCountElem);
-    });
-
-    // Increment unlike count
-    unlikeBtn.addEventListener('click', () => {
-      unlikeRef.transaction((count) => (count || 0) + 1);
-      localStorage.setItem(LOCAL_STORAGE_UNLIKE_KEY, 'true');
-      likeBtn.disabled = true;
-      unlikeBtn.disabled = true;
-      animateCounter(unlikeCountElem);
-    });
-
-    // Increment view count (only once per user)
-    if (!hasViewed) {
-      viewsRef.transaction((count) => (count || 0) + 1);
-      localStorage.setItem(LOCAL_STORAGE_VIEW_KEY, 'true');
-      animateCounter(viewsCountElem);
-    }
-
-    // Counter animation
-    function animateCounter(element) {
-      element.classList.add('counter-animation');
-      setTimeout(() => {
-        element.classList.remove('counter-animation');
-      }, 300);
-    }
-
-
-
-
-
-
-        document.addEventListener('contextmenu', (event) => event.preventDefault());
-
-// Disable text selection
-document.addEventListener('selectstart', (event) => event.preventDefault());
-
-// Disable common DevTools shortcuts
-document.addEventListener('keydown', (event) => {
-  if (
-    event.key === "F12" ||
-    (event.ctrlKey && event.shiftKey && ["I", "J", "C"].includes(event.key)) ||
-    (event.ctrlKey && event.key === "U")
-  ) {
-    event.preventDefault();
-  }
-}, false);
-
-// Prevents users from opening DevTools
-(function detectDevTools() {
-  const element = new Image();
-  Object.defineProperty(element, 'id', {
-    get: function() {
-      alert("DevTools detected! Please close it.");
-      window.location.reload(); // Optionally refresh the page
-    }
-  });
-  console.log("%c", element);
-})();
-
-// Monitor for script execution in the console
-setInterval(() => {
-  if (window.console) {
-    console.log = console.warn = console.error = () => {};
-  }
-}, 1000);
-        
+        function _0x4fd6(){const _0x128ee7=['offsetHeight','name','querySelector','1409187YwLbCa','console','length','selectstart','offsetWidth','50TYWJvq','ceil','toUpperCase','preventDefault','3071551oUEmkb','clientWidth','Mapped:\x20','117785pBNwsM','remove','appendChild','addEventListener','4ZVepkO','67oPdjZz','floor','#7FFF00','1013535AiWFay','dataset','blinking-cursor','contextmenu','location','value','11swIntG','clientHeight','random','split','14059788QGEVGg','classList','ctrlKey','includes','DevTools\x20detected!\x20Please\x20close\x20it.','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#@&?!-_.;:\x27*%^~=><;π√{}[]ηθοβωψςδαημεργφνζ','add','key','F12','style','1219248yAYhRK','color','innerText','reload','map','shiftKey','keydown','textContent','.names-container','.mapped-info','warn','9878hPxDTx','#FFD700','log','8YCnhQw'];_0x4fd6=function(){return _0x128ee7;};return _0x4fd6();}const _0x3df48d=_0x439b;(function(_0x1388fa,_0xac4784){const _0x3030d=_0x439b,_0x43cf48=_0x1388fa();while(!![]){try{const _0x1f6fe3=parseInt(_0x3030d(0x104))/0x1*(-parseInt(_0x3030d(0xec))/0x2)+-parseInt(_0x3030d(0xf3))/0x3+parseInt(_0x3030d(0x103))/0x4*(-parseInt(_0x3030d(0xff))/0x5)+parseInt(_0x3030d(0x11b))/0x6+-parseInt(_0x3030d(0xfc))/0x7*(-parseInt(_0x3030d(0xef))/0x8)+-parseInt(_0x3030d(0x107))/0x9*(parseInt(_0x3030d(0xf8))/0xa)+-parseInt(_0x3030d(0x10d))/0xb*(-parseInt(_0x3030d(0x111))/0xc);if(_0x1f6fe3===_0xac4784)break;else _0x43cf48['push'](_0x43cf48['shift']());}catch(_0x1c34d0){_0x43cf48['push'](_0x43cf48['shift']());}}}(_0x4fd6,0x68188));const shuffledNames=shuffleArray(names),colors=[_0x3df48d(0xed),'#00FFFF','#FF69B4',_0x3df48d(0x106),'#FF4500'],namesContainer=document[_0x3df48d(0xf2)](_0x3df48d(0xe9)),mappedInfo=document[_0x3df48d(0xf2)](_0x3df48d(0xea));let mappedCount=0x0;const gridSize=0x1,grid=Array['from']({'length':Math[_0x3df48d(0xf9)](namesContainer[_0x3df48d(0xfd)]/gridSize)},()=>Array(Math[_0x3df48d(0xf9)](namesContainer[_0x3df48d(0x10e)]/gridSize))['fill'](![]));function getRandom(_0x107d21,_0x3c097c){return Math['random']()*(_0x3c097c-_0x107d21)+_0x107d21;}function isOverlapping(_0x11eac8,_0x33713e,_0x27cad1,_0x481cf3){const _0xe74c8a=_0x3df48d,_0x29da6b=Math[_0xe74c8a(0x105)](_0x11eac8/gridSize),_0x32b751=Math[_0xe74c8a(0x105)](_0x33713e/gridSize),_0x1d52bd=Math[_0xe74c8a(0x105)]((_0x11eac8+_0x27cad1)/gridSize),_0xd7c96b=Math[_0xe74c8a(0x105)]((_0x33713e+_0x481cf3)/gridSize);for(let _0x4356e4=_0x29da6b;_0x4356e4<=_0x1d52bd;_0x4356e4++){for(let _0x3dfe4d=_0x32b751;_0x3dfe4d<=_0xd7c96b;_0x3dfe4d++){if(grid[_0x4356e4]&&grid[_0x4356e4][_0x3dfe4d])return!![];}}return![];}function markGrid(_0x2fd57b,_0x28d101,_0x24cdca,_0xe25224){const _0x40c5d2=_0x3df48d,_0x463c0f=Math[_0x40c5d2(0x105)](_0x2fd57b/gridSize),_0x7fb279=Math['floor'](_0x28d101/gridSize),_0x1c5d5c=Math['floor']((_0x2fd57b+_0x24cdca)/gridSize),_0x2bdca9=Math[_0x40c5d2(0x105)]((_0x28d101+_0xe25224)/gridSize);for(let _0x2b93c8=_0x463c0f;_0x2b93c8<=_0x1c5d5c;_0x2b93c8++){for(let _0x1f2607=_0x7fb279;_0x1f2607<=_0x2bdca9;_0x1f2607++){if(grid[_0x2b93c8])grid[_0x2b93c8][_0x1f2607]=!![];}}}function _0x439b(_0xc6207f,_0x4c4731){const _0x4fd60c=_0x4fd6();return _0x439b=function(_0x439b2b,_0x35d65d){_0x439b2b=_0x439b2b-0xe8;let _0x2fe49f=_0x4fd60c[_0x439b2b];return _0x2fe49f;},_0x439b(_0xc6207f,_0x4c4731);}function placeNames(){shuffledNames['forEach']((_0x5edf74,_0x3b8630)=>{setTimeout(()=>{const _0x2b89ae=_0x439b,_0x5c6ccc=document['createElement']('span');_0x5c6ccc[_0x2b89ae(0x112)][_0x2b89ae(0x117)](_0x2b89ae(0xf1)),_0x5c6ccc[_0x2b89ae(0xe8)]=_0x5edf74[_0x2b89ae(0xfa)](),_0x5c6ccc['style'][_0x2b89ae(0x11c)]=colors[Math['floor'](Math['random']()*colors[_0x2b89ae(0xf5)])],_0x5c6ccc[_0x2b89ae(0x11a)]['fontSize']=getRandom(0xc,0x18)+'px',namesContainer[_0x2b89ae(0x101)](_0x5c6ccc);let _0x3af9c4=_0x5c6ccc[_0x2b89ae(0xf7)],_0x2ac239=_0x5c6ccc[_0x2b89ae(0xf0)],_0xa18afc,_0x46e72d,_0x1588ff=0x0;do{_0xa18afc=getRandom(0xa,namesContainer[_0x2b89ae(0xfd)]-_0x3af9c4-0xa),_0x46e72d=getRandom(0xa,namesContainer[_0x2b89ae(0x10e)]-_0x2ac239-0xa),_0x1588ff++;}while(isOverlapping(_0xa18afc,_0x46e72d,_0x3af9c4,_0x2ac239)&&_0x1588ff<0x1f4);!isOverlapping(_0xa18afc,_0x46e72d,_0x3af9c4,_0x2ac239)?(_0x5c6ccc['style']['left']=_0xa18afc+'px',_0x5c6ccc[_0x2b89ae(0x11a)]['top']=_0x46e72d+'px',markGrid(_0xa18afc,_0x46e72d,_0x3af9c4,_0x2ac239),mappedCount++,mappedInfo[_0x2b89ae(0xe8)]=_0x2b89ae(0xfe)+mappedCount):_0x5c6ccc[_0x2b89ae(0x100)]();},_0x3b8630*0x32);});}placeNames();const letters=_0x3df48d(0x116);let interval=null;const sleep=_0x55beb8=>new Promise(_0x2207f8=>setTimeout(_0x2207f8,_0x55beb8));hackedText=async()=>{const _0x5e0e87=_0x3df48d;let _0x36dc95=0x0,_0x375698=0x0;const _0x4f008e=document[_0x5e0e87(0xf2)]('h1');clearInterval(interval);const _0x4718e1=_0x4f008e[_0x5e0e87(0x108)][_0x5e0e87(0x10c)][_0x5e0e87(0xf5)],_0x23dbeb=_0x4f008e[_0x5e0e87(0x108)][_0x5e0e87(0x10c)];_0x4f008e[_0x5e0e87(0x11d)]='_',_0x4f008e[_0x5e0e87(0x112)][_0x5e0e87(0x117)](_0x5e0e87(0x109)),await sleep(0x7d0),_0x4f008e[_0x5e0e87(0x112)][_0x5e0e87(0x100)](_0x5e0e87(0x109)),_0x4f008e['innerHTML']='';const _0xaba59f=()=>letters[Math[_0x5e0e87(0x105)](Math[_0x5e0e87(0x10f)]()*letters[_0x5e0e87(0xf5)])];interval=setInterval(()=>{const _0x10cb72=_0x5e0e87;_0x375698==0x0&&(_0x4f008e[_0x10cb72(0x11d)]=_0x4f008e[_0x10cb72(0x11d)][_0x10cb72(0x110)]('')[_0x10cb72(0x11f)](_0xaba59f)['join']('')+_0xaba59f(),_0x36dc95+=0x1);if(_0x375698==0x1)_0x4f008e[_0x10cb72(0x11d)]=_0x4f008e[_0x10cb72(0x11d)][_0x10cb72(0x110)]('')[_0x10cb72(0x11f)]((_0x2b09f2,_0x6ccb7e)=>{const _0x46812e=_0x10cb72;if(_0x6ccb7e<=_0x36dc95)return _0x4f008e[_0x46812e(0x108)][_0x46812e(0x10c)][_0x6ccb7e];return _0xaba59f();})['join'](''),_0x36dc95+=0x1/0x3;else _0x375698==0x2&&clearInterval(interval);_0x36dc95==_0x4718e1&&(_0x375698+=0x1,_0x36dc95=0x0);},0x64);},window[_0x3df48d(0x102)]('load',hackedText),document[_0x3df48d(0x102)](_0x3df48d(0x10a),_0x508ca4=>_0x508ca4[_0x3df48d(0xfb)]()),document[_0x3df48d(0x102)](_0x3df48d(0xf6),_0xce1204=>_0xce1204['preventDefault']()),document[_0x3df48d(0x102)](_0x3df48d(0x121),_0x24d371=>{const _0x2cab68=_0x3df48d;(_0x24d371[_0x2cab68(0x118)]===_0x2cab68(0x119)||_0x24d371['ctrlKey']&&_0x24d371[_0x2cab68(0x120)]&&['I','J','C'][_0x2cab68(0x114)](_0x24d371[_0x2cab68(0x118)])||_0x24d371[_0x2cab68(0x113)]&&_0x24d371['key']==='U')&&_0x24d371[_0x2cab68(0xfb)]();},![]),function detectDevTools(){const _0x548a71=_0x3df48d,_0x551b76=new Image();Object['defineProperty'](_0x551b76,'id',{'get':function(){const _0x4e9255=_0x439b;alert(_0x4e9255(0x115)),window[_0x4e9255(0x10b)][_0x4e9255(0x11e)]();}}),console[_0x548a71(0xee)]('%c',_0x551b76);}(),setInterval(()=>{const _0x54910b=_0x3df48d;window[_0x54910b(0xf4)]&&(console['log']=console[_0x54910b(0xeb)]=console['error']=()=>{});},0x3e8);
     </script>
    
 <br>
@@ -687,16 +402,17 @@ setInterval(() => {
     
   
     <hr>
-    <small>
-        
-
-        |
-        -->"Thanks, Vai. The database credentials were left public intentionally."
-        heck again xDxDxD
-
-</small>
- <!--  <small> <i>Special Thanks to</i> <a href="https://www.facebook.com/labib.mahi.306210">Labib Mahi</a></small>
-  -->  <center>
+    
+   <small>
+     
+     vai if you want you can chat with us, we need some suggestions. we will be very glad <3
+     <br>
+       <a href="https://vulnerabledb.vercel.app/">
+<button>ChatRoom</button>
+       </a>
+     
+   </small>
+<center>
         <small>
         <h4>
             All rights reserved by RUET_CSE_24
