@@ -403,6 +403,39 @@
       : (type === 'login' ? 'Login' : 'Update Profile');
     document.getElementById(button).disabled = show;
   }
+
+
+
+
+  // Disable right-click context menu on images
+document.addEventListener("contextmenu", e => {
+  if (e.target.tagName === 'IMG') e.preventDefault();
+});
+
+// Disable text and image selection
+document.addEventListener("selectstart", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+
+// Block common devtools shortcuts
+document.addEventListener("keydown", e => {
+  if (
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || // Ctrl+Shift+I/J/C
+    (e.ctrlKey && e.key === 'U') || // Ctrl+U (view source)
+    (e.key === 'F12') // F12
+  ) {
+    e.preventDefault();
+    alert("Not allowed!");
+  }
+});
+
+// Disable console access
+setInterval(() => {
+  const consoleCheck = /./;
+  consoleCheck.toString = function() {
+    throw "Console access is disabled!";
+  }
+  console.log(consoleCheck);
+}, 1000);
 </script>
 </body>
   </html>
