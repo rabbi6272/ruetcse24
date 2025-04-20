@@ -160,8 +160,49 @@
     }
 
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+
+    <a href="profiles/" 
+   style="
+     position: fixed;
+     top: 20px;
+     right: 20px;
+     width: 60px;
+     height: 60px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     background-color: #007bff;
+     color: #fff;
+     border-radius: 50%;
+     text-decoration: none;
+     font-size: 24px;
+     box-shadow: 0 0 10px rgba(0,123,255,0.5);
+     animation: blow 1.5s infinite;
+     transition: background-color 0.3s;
+     z-index: 9999;
+   ">
+  <i class="fas fa-users"></i>
+</a>
+
+<style>
+@keyframes blow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(0,123,255,0.5);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 20px rgba(0,123,255,0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(0,123,255,0.5);
+  }
+}
+</style>
   
     <div class="container">
         <img src="l.png" alt="RUET Logo" class="logo">
