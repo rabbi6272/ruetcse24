@@ -109,7 +109,39 @@ document.getElementById('closeAlert').addEventListener('click', () => { document
 
 document.getElementById('accountForm').addEventListener('submit', function(e) { e.preventDefault(); document.getElementById('loader').classList.remove('hidden'); document.getElementById('buttonText').textContent = 'Creating...'; document.getElementById('submitBtn').disabled = true; const formData = { fullName: document.getElementById('fullName').value, nickname: document.getElementById('nickname').value, email: document.getElementById('email').value, hobby: document.getElementById('hobby').value || null, fbProfile: document.getElementById('fbProfile').value || null, bio: document.getElementById('bio').value || null, pincode: document.getElementById('pincode').value, createdAt: firebase.database.ServerValue.TIMESTAMP, profilePicUrl: null }; const file = document.getElementById('profilePic').files[0]; if (file) { const storageRef = storage.ref('profile_pictures/' + Date.now() + '_' + file.name); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()) .then(url => { formData.profilePicUrl = url; saveAccount(formData); }).catch(console.error); } else { saveAccount(formData); } });
 
-function saveAccount(data) { database.ref('accounts').push(data, error => { document.getElementById('loader').classList.add('hidden'); document.getElementById('buttonText').textContent = 'Create Account'; document.getElementById('submitBtn').disabled = false; if (!error) { document.getElementById('successAlert').classList.remove('hidden'); document.getElementById('accountForm').reset(); document.getElementById('imagePreview').style.display = 'none'; } }); } </script>
+function saveAccount(data) { database.ref('accounts').push(data, error => { document.getElementById('loader').classList.add('hidden'); document.getElementById('buttonText').textContent = 'Create Account'; document.getElementById('submitBtn').disabled = false; if (!error) { document.getElementById('successAlert').classList.remove('hidden'); document.getElementById('accountForm').reset(); document.getElementById('imagePreview').style.display = 'none'; } }); } 
+
+  // Disable right-click context menu on images
+document.addEventListener("contextmenu", e => {
+  if (e.target.tagName === 'IMG') e.preventDefault();
+});
+
+// Disable text and image selection
+document.addEventListener("selectstart", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+
+// Block common devtools shortcuts
+document.addEventListener("keydown", e => {
+  if (
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || // Ctrl+Shift+I/J/C
+    (e.ctrlKey && e.key === 'U') || // Ctrl+U (view source)
+    (e.key === 'F12') // F12
+  ) {
+    e.preventDefault();
+    alert("Not allowed!");
+  }
+});
+
+// Disable console access
+setInterval(() => {
+  const consoleCheck = /./;
+  consoleCheck.toString = function() {
+    throw "Console access is disabled!";
+  }
+  console.log(consoleCheck);
+}, 1000);
+  
+</script>
 
 </body>
 </html>
