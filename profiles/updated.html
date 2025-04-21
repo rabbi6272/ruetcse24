@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Directory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Delius&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: ghostwhite;
+        }
+        
+        .names {
+          margin-top:100px;
+          font-size: 25px;
+        }
+        
+        .profile-card {
+            transition: all 0.3s ease;
+            background-color: #f9fafb; /* Off-white background */
+        }
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .avatar {
+          margin-top:50px;
+            transition: all 0.3s ease;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 1px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+            position: relative;
+            overflow: hidden;
+            
+        }
+        .avatar::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 77%,
+                rgba(255, 255, 255, 0.3) 92%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.7s ease;
+        }
+        .avatar:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+        .hobby-badge {
+            background-color: #E0E7FF;
+            color: #4F46E5;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .hobby-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(79, 70, 229, 0.2);
+        }
+        .bio-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.5;
+        }
+        .card-border {
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .search-btn {
+            transition: all 0.2s ease;
+        }
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+   <!-- <a style="position:fixed;top:2px; right:2px; padding:10px; border:1px solid dodgerblue;background: dodgerblue; color:#fff" href="../editprofile/">login now!</a>
+--><body class="min-h-screen p-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-light text-gray-800 mb-2">User Directory</h1>
+            <p class="text-gray-600">Browse our community members</p>
+        </div>
+        
+        <!-- Search and Stats -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 transition-all duration-300 hover:shadow-md card-border">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="relative flex-grow flex">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-l-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition duration-300"
+                        placeholder="Search by name, nickname, or hobby..."
+                    >
+                    <button 
+                        id="searchButton"
+                        class="search-btn bg-indigo-600 text-white px-4 py-2 rounded-r-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                        Search
+                    </button>
+                </div>
+                <div class="bg-indigo-50 text-indigo-800 px-4 py-2 rounded-lg flex items-center transition duration-300 hover:bg-indigo-100">
+                    <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 12.094A5.973 5.973 0 004 15v1H1v-1a3 3 0 013.75-2.906z"></path>
+                    </svg>
+                    <span id="profileCount">0</span>&nbsp; profiles found
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-12">
+            <div class="loader"></div>
+            <p class="mt-2 text-gray-600">Loading profiles...</p>
+        </div>
+        
+        <!-- Profiles Grid -->
+        <div id="profilesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+            <!-- Profiles will be loaded here dynamically -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">No profiles found</h3>
+            <p class="mt-1 text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+        </div>
+    </div>
+
+    <!-- Profile Card Template (hidden) -->
+   <template id="profileTemplate">
+    <div class="profile-card relative rounded-xl shadow-sm overflow-hidden hover:shadow-md card-border">
+        
+        <!-- Badge -->
+        
+        
+        <div class="bg-white h-40 flex items-center justify-center p-4">
+            <!-- Profile image will be inserted here -->
+        </div>
+        
+        <div class="p-5">
+            <div class="flex flex-col items-center text-center -mt-16 mb-4">
+                <!-- Name and nickname will be inserted here -->
+            </div>
+            
+            <div class="mt-2 pt-4 border-t border-gray-100 flex items-start gap-2">
+                <i style="font-size:15px;color:gray" class="fa">&#xf10d;</i>
+                <p class="text-lg text-dark-400 bio-text" data-name="bio" style="font-family: 'Delius', cursive; font-weight: 400; font-style: normal;">No bio provided</p>
+            </div>
+            
+            <div class="mt-4 space-y-3">
+                <div class="flex items-center justify-center text-lg text-gray-500">
+                    <i class="fas fa-envelope mr-1.5 h-5 w-5 text-gray-400"></i>
+                    <span data-name="email">email@example.com</span>
+                </div>
+                
+                <div class="flex justify-center" data-name="hobbyContainer">
+                    <span class="flex items-center text-lg text-dark-500">
+                        <i class="fas fa-fire h-4 w-4 mr-1 text-red-400"></i>
+                        <span data-name="hobby">Hobby not specified</span>
+                    </span>
+                </div>
+                
+                <div class="flex justify-center text-lg text-gray-500" data-name="fbContainer">
+                    <a href="#" target="_blank" class="text-blue-600 hover:underline flex items-center" data-name="fbProfile">
+                        <i class="fab fa-facebook h-4 w-4 mr-1"></i>
+                        &nbsp; View Facebook Profile
+                    </a>
+                </div>
+                
+                <hr>
+                <br>
+                <span class="text-gray-600 text-sm">Updated <span id="uw">0 mins ago</span></span>
+            </div>
+        </div>
+    </div>
+    
+</template>
+
+
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAov5QhTpQ_1svMOFgWsg3E8tRalKrbs2U",
+        authDomain: "last-197cd.firebaseapp.com",
+        databaseURL: "https://last-197cd-default-rtdb.firebaseio.com",
+        projectId: "last-197cd",
+        storageBucket: "last-197cd.appspot.com",
+        messagingSenderId: "176790808601",
+        appId: "1:176790808601:web:af5bbe0fee206d74b86288",
+        measurementId: "G-JPSKNHEVJT"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    
+    // DOM elements
+    const profilesContainer = document.getElementById("profilesContainer");
+    const loadingState = document.getElementById("loadingState");
+    const emptyState = document.getElementById("emptyState");
+    const profileTemplate = document.getElementById("profileTemplate");
+    const profileCount = document.getElementById("profileCount");
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    
+    // Function to format time ago
+    function formatTimeAgo(timestamp) {
+        const now = Date.now();
+        const diffInSeconds = Math.floor((now - timestamp) / 1000);
+        
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds} sec${diffInSeconds === 1 ? '' : 's'} ago`;
+        }
+        
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) {
+            return `${diffInMinutes} min${diffInMinutes === 1 ? '' : 's'} ago`;
+        }
+        
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) {
+            return `${diffInHours} hour${diffInHours === 1 ? '' : 's'} ago`;
+        }
+        
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 30) {
+            return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`;
+        }
+        
+        const diffInMonths = Math.floor(diffInDays / 30);
+        if (diffInMonths < 12) {
+            return `${diffInMonths} month${diffInMonths === 1 ? '' : 's'} ago`;
+        }
+        
+        const diffInYears = Math.floor(diffInMonths / 12);
+        return `${diffInYears} year${diffInYears === 1 ? '' : 's'} ago`;
+    }
+    
+    // Function to create avatar element
+    function createAvatar(profile) {
+        const avatarContainer = document.createElement('div');
+        avatarContainer.className = 'relative w-full h-full flex items-center  justify-center';
+        
+        if (profile.profilePicUrl) {
+            const img = document.createElement('img');
+            img.src = profile.profilePicUrl;
+            img.alt = profile.fullName || 'Profile';
+            img.className = 'avatar';
+            
+            // Add shine effect container
+            const shineDiv = document.createElement('div');
+            shineDiv.className = 'shine-effect';
+            
+            if (profile.fbProfile) {
+                const link = document.createElement('a');
+                link.href = profile.fbProfile;
+                link.target = '_blank';
+                link.appendChild(img);
+                avatarContainer.appendChild(link);
+            } else {
+                avatarContainer.appendChild(img);
+            }
+        } else {
+            // Fallback to initials if no image
+            const initialsDiv = document.createElement('div');
+            initialsDiv.className = 'avatar bg-indigo-500 text-white flex items-center justify-center text-2xl font-bold';
+            initialsDiv.textContent = profile.fullName ? profile.fullName.charAt(0).toUpperCase() : '?';
+            
+            if (profile.fbProfile) {
+                const link = document.createElement('a');
+                link.href = profile.fbProfile;
+                link.target = '_blank';
+                link.appendChild(initialsDiv);
+                avatarContainer.appendChild(link);
+            } else {
+                avatarContainer.appendChild(initialsDiv);
+            }
+        }
+        
+        return avatarContainer;
+    }
+    
+    // Function to perform search
+    function performSearch() {
+        const searchValue = searchInput.value.toLowerCase();
+        const cards = profilesContainer.querySelectorAll(".profile-card");
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+            const nameElement = card.querySelector('.names');
+            const nicknameElement = card.querySelector('.text-indigo-600');
+            const hobbyElement = card.querySelector('[data-name="hobby"]');
+            
+            const name = nameElement ? nameElement.textContent.toLowerCase() : '';
+            const nickname = nicknameElement ? nicknameElement.textContent.toLowerCase() : '';
+            const hobby = hobbyElement ? hobbyElement.textContent.toLowerCase() : '';
+            
+            if (name.includes(searchValue) || nickname.includes(searchValue) || hobby.includes(searchValue)) {
+                card.style.display = "block";
+                visibleCount++;
+            } else {
+                card.style.display = "none";
+            }
+        });
+        
+        profileCount.textContent = visibleCount;
+        
+        if (visibleCount === 0) {
+            emptyState.classList.remove("hidden");
+            profilesContainer.classList.add("hidden");
+        } else {
+            emptyState.classList.add("hidden");
+            profilesContainer.classList.remove("hidden");
+        }
+    }
+    
+    // Fetch and render profiles
+    function loadProfiles() {
+        database.ref("accounts").once("value", (snapshot) => {
+            const profilesData = snapshot.val();
+            profilesContainer.innerHTML = ""; // clear existing
+            let count = 0;
+            
+            if (profilesData) {
+                // Convert object to array and sort alphabetically by fullName
+                const profilesArray = Object.values(profilesData);
+                profilesArray.sort((a, b) => {
+                    const nameA = a.fullName?.toUpperCase() || '';
+                    const nameB = b.fullName?.toUpperCase() || '';
+                    return nameA.localeCompare(nameB);
+                });
+                
+                // Create and append profile cards
+                profilesArray.forEach(profile => {
+                    if (!profile) return; // Skip if profile is null/undefined
+                    
+                    const card = profileTemplate.content.cloneNode(true);
+                    const header = card.querySelector('.bg-white');
+                    const nameContainer = card.querySelector('.flex-col.items-center');
+                    
+                    // Create and insert avatar
+                    const avatar = createAvatar(profile);
+                    header.appendChild(avatar);
+                    
+                    // Add name and nickname
+                    const nameElement = document.createElement('h3');
+                    nameElement.className = 'names';
+                    nameElement.textContent = profile.fullName || "Unknown Name";
+                    nameElement.setAttribute('data-name', 'fullName');
+                    
+                    const nicknameElement = document.createElement('p');
+                    nicknameElement.className = 'text-indigo-600';
+                    nicknameElement.textContent = profile.nickname ? `@${profile.nickname}` : "@unknown";
+                    nicknameElement.setAttribute('data-name', 'nickname');
+                    
+                    nameContainer.appendChild(nameElement);
+                    nameContainer.appendChild(nicknameElement);
+                    
+                    // Fill in profile data
+                    card.querySelector('[data-name="email"]').textContent = profile.email || "Not provided";
+                    card.querySelector('[data-name="hobby"]').textContent = profile.hobby || "No hobby specified";
+                    card.querySelector('[data-name="bio"]').textContent = profile.bio || "No bio provided";
+                    
+                    // Handle Facebook profile link
+                    const fbLink = card.querySelector('[data-name="fbProfile"]');
+                    if (profile.fbProfile) {
+                        fbLink.href = profile.fbProfile;
+                    } else {
+                        fbLink.parentElement.style.display = "none";
+                    }
+                    
+                    // Hide hobby if not provided
+                    if (!profile.hobby) {
+                        card.querySelector('[data-name="hobbyContainer"]').style.display = "none";
+                    }
+                    
+                    // Update the "Last updated" time
+                    if (profile.updatedAt) {
+                        const timeAgoElement = card.querySelector('#uw');
+                        if (timeAgoElement) {
+                            timeAgoElement.textContent = formatTimeAgo(profile.updatedAt);
+                        }
+                    } else {
+                        const timeAgoElement = card.querySelector('#uw');
+                        if (timeAgoElement) {
+                            timeAgoElement.textContent = "a long time ago.";
+                        }
+                    }
+                    
+                    profilesContainer.appendChild(card);
+                    count++;
+                });
+            }
+            
+            profileCount.textContent = count;
+            loadingState.classList.add("hidden");
+            
+            if (count > 0) {
+                profilesContainer.classList.remove("hidden");
+                emptyState.classList.add("hidden");
+            } else {
+                profilesContainer.classList.add("hidden");
+                emptyState.classList.remove("hidden");
+            }
+        }).catch(error => {
+            console.error("Error loading profiles:", error);
+            loadingState.classList.add("hidden");
+            emptyState.classList.remove("hidden");
+        });
+    }
+    
+    // Search event handlers
+    searchInput.addEventListener("input", performSearch);
+    searchButton.addEventListener("click", performSearch);
+    
+    // Also search when Enter key is pressed
+    searchInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            performSearch();
+        }
+    });
+    
+    // Initial load
+    loadProfiles();
+
+
+
+// Disable right-click context menu on images
+document.addEventListener("contextmenu", e => {
+  if (e.target.tagName === 'IMG') e.preventDefault();
+});
+
+// Disable text and image selection
+document.addEventListener("selectstart", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+
+// Block common devtools shortcuts
+document.addEventListener("keydown", e => {
+  if (
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || // Ctrl+Shift+I/J/C
+    (e.ctrlKey && e.key === 'U') || // Ctrl+U (view source)
+    (e.key === 'F12') // F12
+  ) {
+    e.preventDefault();
+    alert("Not allowed!");
+  }
+});
+
+// Disable console access
+setInterval(() => {
+  const consoleCheck = /./;
+  consoleCheck.toString = function() {
+    throw "Console access is disabled!";
+  }
+  console.log(consoleCheck);
+}, 1000);
+
+
+
+        
+    </script>
+
+
+     <br><br><br>
+    
+ <footer class="w-full bg-gray-100 py-2 text-center text-sm flex flex-wrap items-center justify-center space-x-4 font-sans">
+  <span class="text-gray-600">
+    <i class="far fa-copyright"></i> All Reserved by 
+    <span class="text-blue-600 font-semibold">RUET CSE 24</span>
+  </span>
+
+  <a href="https://m.facebook.com/profile.php?id=61574730479807&name=xhp_nt__fb__action__open_user" 
+     target="_blank" 
+     class="text-blue-500 hover:underline flex items-center space-x-1">
+    <i class="fab fa-facebook"></i>
+    <span>Facebook</span>
+  </a>
+
+  <a href="mailto:ruetcse24@gmail.com" 
+     class="text-gray-700 hover:underline flex items-center space-x-1">
+    <i class="fas fa-envelope"></i>
+    <span>Email</span>
+  </a>
+ </footer>
+</body>
+</html>
