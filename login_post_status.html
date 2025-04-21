@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login to Your Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-storage.js"></script>
+  <style>
+    body { font-family: 'Lato', sans-serif; }
+    .loader {
+      border-top-color: #6366f1;
+      animation: spinner 1.5s linear infinite;
+    }
+    @keyframes spinner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .image-preview {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 8px;
+      margin-top: 10px;
+      object-fit: cover;
+    }
+    .tab-button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .tab-button.active {
+      background-color: #6366f1;
+      color: white;
+    }
+    .profile-tab {
+      padding: 8px 16px;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .profile-tab.active {
+      border-bottom: 3px solid #6366f1;
+      color: #6366f1;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<div id="loginContainer" class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+  <h1 class="text-2xl font-light text-gray-800 mb-6">Login to Your Account</h1>
+  <form id="loginForm" class="space-y-4">
+    <div>
+      <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+      <input type="email" id="loginEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+    </div>
+    <div>
+      <label for="loginPincode" class="block text-sm font-medium text-gray-700 mb-1">6-digit Pincode</label>
+      <input type="password" id="loginPincode" pattern="\d{6}" maxlength="6" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+    </div>
+    <div class="pt-2">
+      <button type="submit" id="loginBtn" class="w-full bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center">
+        <span id="loginButtonText">Login</span>
+        <div id="loginLoader" class="hidden loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+      </button>
+    </div>
+  </form>
+</div>
+
+<div id="profileContainer" class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md hidden">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-light text-gray-800">Your Profile</h1>
+    <button id="logoutBtn" class="text-sm text-indigo-600 hover:text-indigo-800">Logout</button>
+  </div>
+  
+  <div class="flex border-b mb-4">
+    <div class="profile-tab active" id="editProfileTabBtn">Edit Profile</div>
+    <div class="profile-tab" id="postStatusTabBtn">Post Status</div>
+  </div>
+  
+  <div id="editProfileTab">
+    <form id="profileForm" class="space-y-4">
+      <div class="flex items-center space-x-4">
+        <div>
+          <img id="profileImagePreview" class="image-preview" src="" alt="Profile Preview">
+          <div class="flex space-x-2 mt-2">
+            <div class="tab-button active" id="uploadTabBtn">Upload</div>
+            <div class="tab-button" id="urlTabBtn">URL</div>
+          </div>
+          <div id="uploadTab" class="mt-2">
+            <input type="file" id="updateProfilePic" accept="image/*" class="w-full text-sm">
+          </div>
+          <div id="urlTab" class="mt-2 hidden">
+            <input type="url" id="profileImageUrl" placeholder="Enter image URL" class="w-full px-2 py-1 border rounded text-sm">
+            <button type="button" id="loadImageBtn" class="mt-1 text-xs bg-indigo-500 text-white px-2 py-1 rounded">Load Image</button>
+          </div>
+        </div>
+        
+        <div class="">
+          <div>
+            <label for="updateFullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="updateFullName" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="updateNickname" class="block text-sm font-medium text-gray-700 mb-1">Nickname</label>
+        <input type="text" id="updateNickname" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+      </div>
+      
+      <div>
+        <label for="updateEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+        <input type="email" id="updateEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+        <p id="updateEmailError" class="text-red-500 text-xs mt-1 hidden">This email is already registered</p>
+      </div>
+      
+      <div>
+        <label for="updateHobby" class="block text-sm font-medium text-gray-700 mb-1">Hobby (Optional)</label>
+        <input type="text" id="updateHobby" class="w-full px-4 py-2 border rounded-lg focus:ring-2">
+      </div>
+      
+      <div>
+        <label for="updateFbProfile" class="block text-sm font-medium text-gray-700 mb-1">Facebook Profile (Optional)</label>
+        <input type="url" id="updateFbProfile" class="w-full px-4 py-2 border rounded-lg focus:ring-2">
+      </div>
+      
+      <div>
+        <label for="updateBio" class="block text-sm font-medium text-gray-700 mb-1">Short Bio (Optional)</label>
+        <textarea id="updateBio" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2"></textarea>
+      </div>
+      
+      <div>
+        <label for="updatePincode" class="block text-sm font-medium text-gray-700 mb-1">6-digit Pincode</label>
+        <input type="text" id="updatePincode" pattern="\d{6}" maxlength="6" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+      </div>
+      
+      <div class="pt-2 flex space-x-3">
+        <button type="submit" id="updateBtn" class="flex-1 bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center">
+          <span id="updateButtonText">Update Profile</span>
+          <div id="updateLoader" class="hidden loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+        </button>
+        <button type="button" id="deleteBtn" class="flex-1 bg-red-500 text-white py-2.5 rounded-lg">Delete Account</button>
+      </div>
+    </form>
+  </div>
+  
+  <div id="postStatusTab" class="hidden">
+    <div id="statusContainer" class="space-y-4">
+      <div id="currentStatusContainer" class="hidden">
+        <h3 class="text-lg font-medium text-gray-800 mb-2">Your Current Status</h3>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <p id="currentStatusText" class="text-gray-700"></p>
+          <p id="currentStatusTime" class="text-sm text-gray-500 mt-2"></p>
+        </div>
+        <div class="flex space-x-2 mt-2">
+          <button id="editStatusBtn" class="text-sm bg-indigo-500 text-white px-3 py-1 rounded">Edit</button>
+          <button id="deleteStatusBtn" class="text-sm bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+        </div>
+      </div>
+      
+      <form id="statusForm" class="space-y-4">
+        <div>
+          <label for="statusText" class="block text-sm font-medium text-gray-700 mb-1">What's on your mind?</label>
+         <textarea id="statusText" rows="4" maxlength="50"
+  class="w-full px-4 py-2 border rounded-lg focus:ring-2"
+  placeholder="Share your thoughts (max 50 chars)..."></textarea>
+<div id="charCount" class="text-sm text-gray-500 mt-1">0 / 50</div>
+        </div>
+        <div class="pt-2">
+          <button type="submit" id="submitStatusBtn" class="w-full bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center">
+            <span id="statusButtonText">Post Status</span>
+            <div id="statusLoader" class="hidden loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="alertContainer" class="fixed top-4 right-4 hidden">
+  <div class="bg-green-100 border text-green-700 px-4 py-3 rounded relative w-80" role="alert">
+    <strong class="font-bold" id="alertTitle">Success!</strong>
+    <span class="block" id="alertMessage">Operation completed successfully.</span>
+    <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" id="closeAlert">×</span>
+  </div>
+</div>
+
+<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+    <h3 class="text-lg font-medium text-gray-900 mb-4" id="confirmTitle">Confirm Deletion</h3>
+    <p class="text-sm text-gray-500 mb-6" id="confirmMessage">Are you sure you want to delete your account? This action cannot be undone.</p>
+    <div class="flex justify-end space-x-3">
+      <button type="button" id="cancelDelete" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+      <button type="button" id="confirmDelete" class="px-4 py-2 bg-red-600 rounded-md text-sm font-medium text-white hover:bg-red-700">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+const statusText = document.getElementById('statusText');
+const charCount = document.getElementById('charCount');
+
+statusText.addEventListener('input', () => {
+  charCount.textContent = `${statusText.value.length} / 50`;
+});
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAov5QhTpQ_1svMOFgWsg3E8tRalKrbs2U",
+    authDomain: "last-197cd.firebaseapp.com",
+    databaseURL: "https://last-197cd-default-rtdb.firebaseio.com",
+    projectId: "last-197cd",
+    storageBucket: "last-197cd.appspot.com",
+    messagingSenderId: "176790808601",
+    appId: "1:176790808601:web:af5bbe0fee206d74b86288",
+    measurementId: "G-JPSKNHEVJT"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const storage = firebase.storage();
+
+  // Global variables
+  let currentUserKey = null;
+  let currentUserData = null;
+  let imageSourceType = 'upload'; // 'upload' or 'url'
+  let currentStatus = null;
+
+  // DOM elements
+  const loginContainer = document.getElementById('loginContainer');
+  const profileContainer = document.getElementById('profileContainer');
+  const loginForm = document.getElementById('loginForm');
+  const profileForm = document.getElementById('profileForm');
+  const statusForm = document.getElementById('statusForm');
+  const alertContainer = document.getElementById('alertContainer');
+  const confirmModal = document.getElementById('confirmModal');
+  const uploadTabBtn = document.getElementById('uploadTabBtn');
+  const urlTabBtn = document.getElementById('urlTabBtn');
+  const uploadTab = document.getElementById('uploadTab');
+  const urlTab = document.getElementById('urlTab');
+  const loadImageBtn = document.getElementById('loadImageBtn');
+  const editProfileTabBtn = document.getElementById('editProfileTabBtn');
+  const postStatusTabBtn = document.getElementById('postStatusTabBtn');
+  const editProfileTab = document.getElementById('editProfileTab');
+  const postStatusTab = document.getElementById('postStatusTab');
+  const currentStatusContainer = document.getElementById('currentStatusContainer');
+  const currentStatusText = document.getElementById('currentStatusText');
+  const currentStatusTime = document.getElementById('currentStatusTime');
+  const editStatusBtn = document.getElementById('editStatusBtn');
+  const deleteStatusBtn = document.getElementById('deleteStatusBtn');
+
+  // Login form event listeners
+  loginForm.addEventListener('submit', handleLogin);
+  document.getElementById('closeAlert').addEventListener('click', () => {
+    alertContainer.classList.add('hidden');
+  });
+
+  // Profile form event listeners
+  profileForm.addEventListener('submit', handleUpdateProfile);
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+  document.getElementById('deleteBtn').addEventListener('click', () => {
+    showConfirmModal(
+      'Confirm Deletion',
+      'Are you sure you want to delete your account? This action cannot be undone.',
+      handleDeleteAccount
+    );
+  });
+  document.getElementById('cancelDelete').addEventListener('click', () => {
+    confirmModal.classList.add('hidden');
+  });
+
+  // Status form event listeners
+  statusForm.addEventListener('submit', handleStatusSubmit);
+  editStatusBtn.addEventListener('click', editCurrentStatus);
+  deleteStatusBtn.addEventListener('click', () => {
+    showConfirmModal(
+      'Confirm Status Deletion',
+      'Are you sure you want to delete your current status?',
+      deleteCurrentStatus
+    );
+  });
+
+  // Tab switching
+  editProfileTabBtn.addEventListener('click', () => switchProfileTab('edit'));
+  postStatusTabBtn.addEventListener('click', () => switchProfileTab('status'));
+
+  // Image tab switching
+  uploadTabBtn.addEventListener('click', () => switchImageTab('upload'));
+  urlTabBtn.addEventListener('click', () => switchImageTab('url'));
+  loadImageBtn.addEventListener('click', loadImageFromUrl);
+
+  // Image preview handling
+  document.getElementById('updateProfilePic').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = event => {
+        document.getElementById('profileImagePreview').src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Functions
+  function switchProfileTab(tab) {
+    if (tab === 'edit') {
+      editProfileTabBtn.classList.add('active');
+      postStatusTabBtn.classList.remove('active');
+      editProfileTab.classList.remove('hidden');
+      postStatusTab.classList.add('hidden');
+    } else {
+      editProfileTabBtn.classList.remove('active');
+      postStatusTabBtn.classList.add('active');
+      editProfileTab.classList.add('hidden');
+      postStatusTab.classList.remove('hidden');
+      loadCurrentStatus();
+    }
+  }
+
+  function switchImageTab(type) {
+    imageSourceType = type;
+    if (type === 'upload') {
+      uploadTabBtn.classList.add('active');
+      urlTabBtn.classList.remove('active');
+      uploadTab.classList.remove('hidden');
+      urlTab.classList.add('hidden');
+    } else {
+      uploadTabBtn.classList.remove('active');
+      urlTabBtn.classList.add('active');
+      uploadTab.classList.add('hidden');
+      urlTab.classList.remove('hidden');
+    }
+  }
+
+  function loadImageFromUrl() {
+    const imageUrl = document.getElementById('profileImageUrl').value.trim();
+    if (imageUrl) {
+      // Basic URL validation
+      try {
+        new URL(imageUrl);
+        document.getElementById('profileImagePreview').src = imageUrl;
+      } catch (e) {
+        showAlert('Error', 'Please enter a valid URL', 'error');
+      }
+    } else {
+      showAlert('Error', 'Please enter an image URL', 'error');
+    }
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const pincode = document.getElementById('loginPincode').value.trim();
+    
+    toggleLoader('login', true);
+    
+    database.ref('accounts').orderByChild('email').equalTo(email).once('value')
+      .then(snapshot => {
+        if (!snapshot.exists()) {
+          showAlert('Error', 'No account found with this email.', 'error');
+          toggleLoader('login', false);
+          return;
+        }
+        
+        let userFound = false;
+        snapshot.forEach(childSnapshot => {
+          const userData = childSnapshot.val();
+          if (userData.pincode === pincode) {
+            userFound = true;
+            currentUserKey = childSnapshot.key;
+            currentUserData = userData;
+            loadUserProfile(userData);
+            loginContainer.classList.add('hidden');
+            profileContainer.classList.remove('hidden');
+          }
+        });
+        
+        if (!userFound) {
+          showAlert('Error', 'Incorrect pincode.', 'error');
+        }
+        toggleLoader('login', false);
+      })
+      .catch(error => {
+        showAlert('Error', 'An error occurred. Please try again.', 'error');
+        toggleLoader('login', false);
+        console.error(error);
+      });
+  }
+
+  function loadUserProfile(userData) {
+    document.getElementById('updateFullName').value = userData.fullName || '';
+    document.getElementById('updateNickname').value = userData.nickname || '';
+    document.getElementById('updateEmail').value = userData.email || '';
+    document.getElementById('updateHobby').value = userData.hobby || '';
+    document.getElementById('updateFbProfile').value = userData.fbProfile || '';
+    document.getElementById('updateBio').value = userData.bio || '';
+    document.getElementById('updatePincode').value = userData.pincode || '';
+    document.getElementById('profileImageUrl').value = '';
+    
+    if (userData.profilePicUrl) {
+      document.getElementById('profileImagePreview').src = userData.profilePicUrl;
+    } else {
+      document.getElementById('profileImagePreview').src = 'https://via.placeholder.com/150';
+    }
+    
+    // Email change validation
+    document.getElementById('updateEmail').addEventListener('blur', function() {
+      const newEmail = this.value.trim();
+      if (newEmail && newEmail !== currentUserData.email) {
+        checkEmailExists(newEmail, 'update');
+      }
+    });
+  }
+
+  function handleUpdateProfile(e) {
+    e.preventDefault();
+    toggleLoader('update', true);
+    
+    const updatedData = {
+      fullName: document.getElementById('updateFullName').value,
+      nickname: document.getElementById('updateNickname').value,
+      email: document.getElementById('updateEmail').value,
+      hobby: document.getElementById('updateHobby').value || null,
+      fbProfile: document.getElementById('updateFbProfile').value || null,
+      bio: document.getElementById('updateBio').value || null,
+      pincode: document.getElementById('updatePincode').value,
+      updatedAt: firebase.database.ServerValue.TIMESTAMP,
+      profilePicUrl: currentUserData.profilePicUrl || null
+    };
+    
+    // Handle image based on selected tab
+    if (imageSourceType === 'upload') {
+      const file = document.getElementById('updateProfilePic').files[0];
+      if (file) {
+        // Upload new profile picture
+        const storageRef = storage.ref('profile_pictures/' + Date.now() + '_' + file.name);
+        storageRef.put(file)
+          .then(snapshot => snapshot.ref.getDownloadURL())
+          .then(url => {
+            updatedData.profilePicUrl = url;
+            updateUserData(updatedData);
+          })
+          .catch(error => {
+            showAlert('Error', 'Failed to upload profile picture.', 'error');
+            toggleLoader('update', false);
+            console.error(error);
+          });
+      } else {
+        updateUserData(updatedData);
+      }
+    } else {
+      const imageUrl = document.getElementById('profileImageUrl').value.trim();
+      if (imageUrl) {
+        updatedData.profilePicUrl = imageUrl;
+      }
+      updateUserData(updatedData);
+    }
+  }
+
+  function updateUserData(data) {
+    database.ref('accounts/' + currentUserKey).update(data)
+      .then(() => {
+        currentUserData = data;
+        showAlert('Success', 'Profile updated successfully!');
+        toggleLoader('update', false);
+      })
+      .catch(error => {
+        showAlert('Error', 'Failed to update profile.', 'error');
+        toggleLoader('update', false);
+        console.error(error);
+      });
+  }
+
+  function handleLogout() {
+    currentUserKey = null;
+    currentUserData = null;
+    currentStatus = null;
+    profileContainer.classList.add('hidden');
+    loginContainer.classList.remove('hidden');
+    loginForm.reset();
+    profileForm.reset();
+    statusForm.reset();
+    document.getElementById('profileImagePreview').src = '';
+    document.getElementById('updateProfilePic').value = '';
+    document.getElementById('profileImageUrl').value = '';
+    switchImageTab('upload');
+    currentStatusContainer.classList.add('hidden');
+  }
+
+  function handleDeleteAccount() {
+    confirmModal.classList.add('hidden');
+    toggleLoader('update', true);
+    
+    // Delete profile picture if exists and was uploaded (not URL)
+    if (currentUserData.profilePicUrl && currentUserData.profilePicUrl.startsWith('https://firebasestorage.googleapis.com')) {
+      const pictureRef = storage.refFromURL(currentUserData.profilePicUrl);
+      pictureRef.delete().catch(error => {
+        console.error('Error deleting profile picture:', error);
+      });
+    }
+    
+    // Delete user data and status
+    database.ref('accounts/' + currentUserKey).remove()
+      .then(() => {
+        return database.ref('statuses/' + currentUserKey).remove();
+      })
+      .then(() => {
+        showAlert('Success', 'Your account has been deleted.');
+        setTimeout(() => {
+          handleLogout();
+          toggleLoader('update', false);
+        }, 1500);
+      })
+      .catch(error => {
+        showAlert('Error', 'Failed to delete account.', 'error');
+        toggleLoader('update', false);
+        console.error(error);
+      });
+  }
+
+  function loadCurrentStatus() {
+    database.ref('statuses/' + currentUserKey).once('value')
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          const statusData = snapshot.val();
+          const now = new Date().getTime();
+          const statusTime = new Date(statusData.timestamp).getTime();
+          const hoursDiff = (now - statusTime) / (1000 * 60 * 60);
+          
+          if (hoursDiff < 24) {
+            currentStatus = statusData;
+            currentStatusText.textContent = statusData.text;
+            currentStatusTime.textContent = `Posted at: ${new Date(statusData.timestamp).toLocaleString()}`;
+            currentStatusContainer.classList.remove('hidden');
+            statusForm.reset();
+          } else {
+            // Status is older than 24 hours, delete it
+            database.ref('statuses/' + currentUserKey).remove()
+              .then(() => {
+                currentStatus = null;
+                currentStatusContainer.classList.add('hidden');
+                statusForm.reset();
+              });
+          }
+        } else {
+          currentStatus = null;
+          currentStatusContainer.classList.add('hidden');
+          statusForm.reset();
+        }
+      })
+      .catch(error => {
+        console.error('Error loading status:', error);
+        showAlert('Error', 'Failed to load status.', 'error');
+      });
+  }
+
+  function handleStatusSubmit(e) {
+    e.preventDefault();
+    const statusText = document.getElementById('statusText').value.trim();
+    
+    if (!statusText) {
+      showAlert('Error', 'Please enter a status message.', 'error');
+      return;
+    }
+    
+    toggleLoader('status', true);
+    
+    const statusData = {
+      text: statusText,
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      userId: currentUserKey
+    };
+    
+    if (currentStatus) {
+      // Update existing status
+      database.ref('statuses/' + currentUserKey).update(statusData)
+        .then(() => {
+          currentStatus = statusData;
+          showAlert('Success', 'Status updated successfully!');
+          loadCurrentStatus();
+          toggleLoader('status', false);
+        })
+        .catch(error => {
+          showAlert('Error', 'Failed to update status.', 'error');
+          toggleLoader('status', false);
+          console.error(error);
+        });
+    } else {
+      // Create new status
+      database.ref('statuses/' + currentUserKey).set(statusData)
+        .then(() => {
+          currentStatus = statusData;
+          showAlert('Success', 'Status posted successfully!');
+          loadCurrentStatus();
+          toggleLoader('status', false);
+        })
+        .catch(error => {
+          showAlert('Error', 'Failed to post status.', 'error');
+          toggleLoader('status', false);
+          console.error(error);
+        });
+    }
+  }
+
+  function editCurrentStatus() {
+    if (currentStatus) {
+      document.getElementById('statusText').value = currentStatus.text;
+      currentStatusContainer.classList.add('hidden');
+    }
+  }
+
+  function deleteCurrentStatus() {
+    confirmModal.classList.add('hidden');
+    toggleLoader('status', true);
+    
+    database.ref('statuses/' + currentUserKey).remove()
+      .then(() => {
+        currentStatus = null;
+        showAlert('Success', 'Status deleted successfully!');
+        currentStatusContainer.classList.add('hidden');
+        statusForm.reset();
+        toggleLoader('status', false);
+      })
+      .catch(error => {
+        showAlert('Error', 'Failed to delete status.', 'error');
+        toggleLoader('status', false);
+        console.error(error);
+      });
+  }
+
+  function checkEmailExists(email, type) {
+    database.ref('accounts').orderByChild('email').equalTo(email).once('value')
+      .then(snapshot => {
+        const exists = snapshot.exists();
+        const errorElement = type === 'update' ? 'updateEmailError' : 'emailError';
+        document.getElementById(errorElement).classList.toggle('hidden', !exists);
+        
+        if (type === 'update') {
+          document.getElementById('updateBtn').disabled = exists;
+        } else {
+          document.getElementById('submitBtn').disabled = exists;
+        }
+      });
+  }
+
+  function showAlert(title, message, type = 'success') {
+    document.getElementById('alertTitle').textContent = title;
+    document.getElementById('alertMessage').textContent = message;
+    
+    const alertDiv = alertContainer.querySelector('div');
+    alertDiv.className = type === 'success' 
+      ? 'bg-green-100 border text-green-700 px-4 py-3 rounded relative w-80' 
+      : 'bg-red-100 border text-red-700 px-4 py-3 rounded relative w-80';
+    
+    alertContainer.classList.remove('hidden');
+    setTimeout(() => {
+      alertContainer.classList.add('hidden');
+    }, 5000);
+  }
+
+  function showConfirmModal(title, message, confirmCallback) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    
+    // Remove previous event listener
+    const confirmButton = document.getElementById('confirmDelete');
+    confirmButton.replaceWith(confirmButton.cloneNode(true));
+    document.getElementById('confirmDelete').addEventListener('click', confirmCallback);
+    
+    confirmModal.classList.remove('hidden');
+  }
+
+  function toggleLoader(type, show) {
+    let loader, buttonText, button;
+    
+    if (type === 'login') {
+      loader = 'loginLoader';
+      buttonText = 'loginButtonText';
+      button = 'loginBtn';
+    } else if (type === 'update') {
+      loader = 'updateLoader';
+      buttonText = 'updateButtonText';
+      button = 'updateBtn';
+    } else if (type === 'status') {
+      loader = 'statusLoader';
+      buttonText = 'statusButtonText';
+      button = 'submitStatusBtn';
+    }
+    
+    document.getElementById(loader).classList.toggle('hidden', !show);
+    document.getElementById(buttonText).textContent = show 
+      ? (type === 'login' ? 'Logging in...' : 
+         type === 'update' ? 'Updating...' : 'Posting...') 
+      : (type === 'login' ? 'Login' : 
+         type === 'update' ? 'Update Profile' : 'Post Status');
+    document.getElementById(button).disabled = show;
+  }
+</script>
+</body>
+</html>
