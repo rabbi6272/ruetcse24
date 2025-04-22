@@ -14,7 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        body {
+                    body {
             font-family: 'Lato', sans-serif;
             background-color: ghostwhite;
         }
@@ -45,40 +45,7 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .avatar {
-          margin-top:50px;
-            transition: all 0.3s ease;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 1px solid white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            object-fit: cover;
-            position: relative;
-            overflow: hidden;
-            
-        }
-        .avatar::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0) 77%,
-                rgba(255, 255, 255, 0.3) 92%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            transition: all 0.7s ease;
-        }
-        .avatar:hover::after {
-            left: 100%;
-            top: 100%;
-        }
+     
         .hobby-badge {
             background-color: #E0E7FF;
             color: #4F46E5;
@@ -112,57 +79,138 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-    .status-bubble {
+        
+           
+        .avatar::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 77%,
+                rgba(255, 255, 255, 0.3) 92%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.7s ease;
+        }
+        .avatar:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+   
+
+.status-bubble:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    background-color: #4f46e5;
+}
+
+.avatar {
+    margin-top: 50px;
+    transition: all 0.3s ease;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 1px solid white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+    position: relative; /* This is important for absolute positioning of child elements */
+    overflow: hidden;
+    z-index: 1; /* Added to ensure avatar stays below status bubble */
+}
+
+.status-bubble {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    background-color: #6366f1;
-    color: #fff;
-    border-radius: 2px;
+    top: 10px; /* Increased from 2px to prevent overlap */
+    right: 10px; /* Increased from 2px to prevent overlap */
+    background-color: #FFFFE2;
+    color: #000;
+    border-radius: 12px;
     padding: 8px 14px;
     font-size: 15px;
-    
-    
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     font-family: 'Delius', cursive;
     font-weight: 400;
     font-style: normal;
-    z-index: 10;
+    z-index: 2; /* Higher than avatar's z-index */
     display: flex;
-    text-align:center;
-    
-
-    
-    
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transform-origin: bottom right;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
+/* Adjust the bubble tails to match new position */
 .status-bubble::after {
     content: "";
     position: absolute;
-    bottom: -6px;
-    left: 10px;
-    width: 8px;
-    height: 8px;
-    background-color: #6366f1;
+    bottom: -8px;
+    right: 20px;
+    width: 12px;
+    height: 12px;
+    background-color: #FFFFE2;
     border-radius: 50%;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 .status-bubble::before {
     content: "";
     position: absolute;
-    bottom: -12px;
-    left: 15px;
-    width: 5px;
-    height: 5px;
-    background-color: #6366f1;
+    bottom: -16px;
+    right: 30px;
+    width: 8px;
+    height: 8px;
+    background-color: #FFFFE2;
     border-radius: 50%;
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Rest of your existing styles remain the same */
+
+.status-bubble:hover::after {
+    background-color: #4f46e5;
+    transform: scale(0.9) translateY(2px);
+}
+
+
+.status-bubble:hover::before {
+    background-color: #4f46e5;
+    transform: scale(0.8) translateY(2px);
 }
 
 .status-bubble i {
     margin-right: 6px;
+
+    transition: transform 0.3s ease;
 }
+
+.status-bubble:hover i {
+    transform: rotate(5deg);
+}
+
+/* Optional: Add a subtle pulse animation */
+@keyframes bubblePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+.status-bubble {
+    animation: bubblePulse 4s infinite;
+}
+
+.status-bubble:hover {
+    animation: none;
+            }
     </style>
 </head>
 
