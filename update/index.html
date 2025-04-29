@@ -297,7 +297,7 @@
             const userId = `user${index + 1}`;
             usersRef.child(userId).set({
               name: name,
-              nickname: name,
+              nickname: (name.split(" "))[0],
               hasChangedNickname: false
             });
           });
