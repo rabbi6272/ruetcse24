@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login to Your Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-storage.js"></script>
+  <style>
+    body { font-family: 'Lato', sans-serif; }
+    .loader {
+      border-top-color: #6366f1;
+      animation: spinner 1.5s linear infinite;
+    }
+    @keyframes spinner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .image-preview {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 8px;
+      margin-top: 10px;
+      object-fit: cover;
+    }
+    .tab-button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .tab-button.active {
+      background-color: #6366f1;
+      color: white;
+    }
+    .profile-tab {
+      padding: 8px 16px;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .profile-tab.active {
+      border-bottom: 3px solid #6366f1;
+      color: #6366f1;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<div id="loginContainer" class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+  <h1 class="text-2xl font-light text-gray-800 mb-6">Login to Your Account</h1>
+  <form id="loginForm" class="space-y-4">
+    <div>
+      <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+      <input type="email" id="loginEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+    </div>
+    <div>
+      <label for="loginPincode" class="block text-sm font-medium text-gray-700 mb-1">6-digit Pincode</label>
+      <input type="password" id="loginPincode" pattern="\d{6}" maxlength="6" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+    </div>
+    <div class="pt-2">
+      <button type="submit" id="loginBtn" class="w-full bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center">
+        <span id="loginButtonText">Login</span>
+        <div id="loginLoader" class="hidden loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+      </button>
+    </div>
+  </form>
+</div>
+
+<div id="profileContainer" class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md hidden">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-light text-gray-800">Your Profile</h1>
+    <button id="logoutBtn" class="text-sm text-indigo-600 hover:text-indigo-800">Logout</button>
+  </div>
+  
+  <div class="flex border-b mb-4">
+    <div class="profile-tab active" id="editProfileTabBtn">Edit Profile</div>
+    <div class="profile-tab" id="postStatusTabBtn">Post Status</div>
+  </div>
+  
+  <div id="editProfileTab">
+    <form id="profileForm" class="space-y-4">
+      <div class="flex items-center space-x-4">
+        <div>
+          <img id="profileImagePreview" class="image-preview" src="" alt="Profile Preview">
+          <div class="flex space-x-2 mt-2">
+            <div class="tab-button active" id="uploadTabBtn">Upload</div>
+            <div class="tab-button" id="urlTabBtn">URL</div>
+          </div>
+          <div id="uploadTab" class="mt-2">
+            <input type="file" id="updateProfilePic" accept="image/*" class="w-full text-sm">
+          </div>
+          <div id="urlTab" class="mt-2 hidden">
+            <input type="url" id="profileImageUrl" placeholder="Enter image URL" class="w-full px-2 py-1 border rounded text-sm">
+            <button type="button" id="loadImageBtn" class="mt-1 text-xs bg-indigo-500 text-white px-2 py-1 rounded">Load Image</button>
+          </div>
+        </div>
+        
+        <div class="">
+          <div>
+            <label for="updateFullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="updateFullName" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="updateNickname" class="block text-sm font-medium text-gray-700 mb-1">Nickname</label>
+        <input type="text" id="updateNickname" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+      </div>
+      
+      <div>
+        <label for="updateEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+        <input type="email" id="updateEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+        <p id="updateEmailError" class="text-red-500 text-xs mt-1 hidden">This email is already registered</p>
+      </div>
+      
+      <div>
+        <label for="updateHobby" class="block text-sm font-medium text-gray-700 mb-1">Hobby (Optional)</label>
+        <input type="text" id="updateHobby" class="w-full px-4 py-2 border rounded-lg focus:ring-2">
+      </div>
+      
+      <div>
+        <label for="updateFbProfile" class="block text-sm font-medium text-gray-700 mb-1">Facebook Profile (Optional)</label>
+        <input type="url" id="updateFbProfile" class="w-full px-4 py-2 border rounded-lg focus:ring-2">
+      </div>
+      
+      <div>
+        <label for="updateBio" class="block text-sm font-medium text-gray-700 mb-1">Short Bio (Optional)</label>
+        <textarea id="updateBio" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2"></textarea>
+      </div>
+      
+      <div>
+        <label for="updatePincode" class="block text-sm font-medium text-gray-700 mb-1">6-digit Pincode</label>
+        <input type="text" id="updatePincode" pattern="\d{6}" maxlength="6" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+      </div>
+      <hr>
+      <div>
+        <label for="abcSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Section:</label>
+        <select id="abcSelect" class="w-full px-4 py-2 border rounded-lg focus:ring-2" required>
+          <option value="" disabled selected>Select one</option>
+          <option value="a">a</option>
+          <option value="b">b</option>
+          <option value="c">c</option>
+        </select>
+      </div>
+      
+      
+      <div class="pt-2 flex space-x-3">
+        <button type="submit" id="updateBtn" class="flex-1 bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center">
+          <span id="updateButtonText">Update Profile</span>
+          <div id="updateLoader" class="hidden loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+        </button>
+        <button type="button" id="deleteBtn" class="flex-1 bg-red-500 text-white py-2.5 rounded-lg">Delete Account</button>
+      </div>
+    </form>
+  </div>
+  
+  <div id="postStatusTab" class="hidden">
+    <div id="statusContainer" class="space-y-4">
+      <div id="currentStatusContainer" class="hidden">
+        <h3 class="text-lg font-medium text-gray-800 mb-2">Your Current Status</h3>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <p id="currentStatusText" class="text-gray-700"></p>
+          <p id="currentStatusTime" class="text-sm text-gray-500 mt-2"></p>
+        </div>
+        <div class="flex space-x-2 mt-2">
+          <button id="editStatusBtn" class="text-sm bg-indigo-500 text-white px-3 py-1 rounded">Edit</button>
+          <button id="deleteStatusBtn" class="text-sm bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+        </div>
+      </div>
+      
+      <form id="statusForm" class="space-y-4">
+        <div>
+          <label for="statusText" class="block text-sm font-medium text-gray-700 mb-1">What's on your mind?</label>
+         <textarea id="statusText" rows="4" maxlength="50"
+  class="w-full px-4 py-2 border rounded-lg focus:ring-2"
+  placeholder="Share your thoughts (max 50 chars)..."></textarea>
+<div id="charCount" class="text-sm text-gray-500 mt-1">0 / 50</div>
+        </div>
+        <div class="pt-2">
+          <button type="submit" id="submitStatusBtn" class="w-full bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center">
+            <span id="statusButtonText">Post Status</span>
+            <div id="statusLoader" class="hidden loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="alertContainer" class="fixed top-4 right-4 hidden">
+  <div class="bg-green-100 border text-green-700 px-4 py-3 rounded relative w-80" role="alert">
+    <strong class="font-bold" id="alertTitle">Success!</strong>
+    <span class="block" id="alertMessage">Operation completed successfully.</span>
+    <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" id="closeAlert">×</span>
+  </div>
+</div>
+
+<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+    <h3 class="text-lg font-medium text-gray-900 mb-4" id="confirmTitle">Confirm Deletion</h3>
+    <p class="text-sm text-gray-500 mb-6" id="confirmMessage">Are you sure you want to delete your account? This action cannot be undone.</p>
+    <div class="flex justify-end space-x-3">
+      <button type="button" id="cancelDelete" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+      <button type="button" id="confirmDelete" class="px-4 py-2 bg-red-600 rounded-md text-sm font-medium text-white hover:bg-red-700">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="../newobs_l.js"></script>
+</body>
+</html>
