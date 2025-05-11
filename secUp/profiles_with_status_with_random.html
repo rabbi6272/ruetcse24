@@ -452,24 +452,40 @@
         const cards = profilesContainer.querySelectorAll(".profile-card");
         let visibleCount = 0;
         
+        // Define our section mappings
+        const sectionMap = {
+            'alpha': 'a',
+            'binary': 'b',
+            'cipher': 'c'  // or whatever your default code is
+        };
+        
         cards.forEach(card => {
             const nameElement = card.querySelector('.names');
             const nicknameElement = card.querySelector('.text-indigo-600');
             const hobbyElement = card.querySelector('[data-name="hobby"]');
-            const secElement = card.querySelector('[data-name="sec"]');
-            const badgeElement = card.querySelector('.hobby-badge');
+            const secBadge = card.querySelector('.hobby-badge');
             
             const name = nameElement ? nameElement.textContent.toLowerCase() : '';
             const nickname = nicknameElement ? nicknameElement.textContent.toLowerCase() : '';
             const hobby = hobbyElement ? hobbyElement.textContent.toLowerCase() : '';
-            const secText = secElement ? secElement.textContent.toLowerCase() : '';
-            const secRawValue = badgeElement ? badgeElement.getAttribute('data-sec') || '' : '';
+            const secValue = secBadge ? secBadge.getAttribute('data-sec') : '';
             
-            if (name.includes(searchValue) || 
-                nickname.includes(searchValue) || 
-                hobby.includes(searchValue) || 
-                secText.includes(searchValue) ||
-                secRawValue.toLowerCase().includes(searchValue)) {
+            // Check if search matches any field or specifically a section
+            const matchesName = name.includes(searchValue);
+            const matchesNickname = nickname.includes(searchValue);
+            const matchesHobby = hobby.includes(searchValue);
+            
+            // Special handling for section search
+            let matchesSection = false;
+            if (searchValue === 'alpha' || searchValue === 'binary' || searchValue === 'cipher') {
+                matchesSection = secValue === sectionMap[searchValue];
+            } else {
+                // Fallback to regular text search in section badge
+                const secText = secBadge ? secBadge.textContent.toLowerCase() : '';
+                matchesSection = secText.includes(searchValue);
+            }
+            
+            if (matchesName || matchesNickname || matchesHobby || matchesSection) {
                 card.style.display = "block";
                 visibleCount++;
             } else {
@@ -487,16 +503,6 @@
             profilesContainer.classList.remove("hidden");
         }
     }
-
-    // Function to shuffle an array (Fisher-Yates algorithm)
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
     // Fetch and render profiles
     function loadProfiles() {
         database.ref("accounts").once("value", (snapshot) => {
