@@ -328,20 +328,21 @@
     </template>
 
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyAov5QhTpQ_1svMOFgWsg3E8tRalKrbs2U",
-        authDomain: "last-197cd.firebaseapp.com",
-        databaseURL: "https://last-197cd-default-rtdb.firebaseio.com",
-        projectId: "last-197cd",
-        storageBucket: "last-197cd.appspot.com",
-        messagingSenderId: "176790808601",
-        appId: "1:176790808601:web:af5bbe0fee206d74b86288",
-        measurementId: "G-JPSKNHEVJT"
-    };
-    firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+ // Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyAov5QhTpQ_1svMOFgWsg3E8tRalKrbs2U",
+    authDomain: "last-197cd.firebaseapp.com",
+    databaseURL: "https://last-197cd-default-rtdb.firebaseio.com",
+    projectId: "last-197cd",
+    storageBucket: "last-197cd.appspot.com",
+    messagingSenderId: "176790808601",
+    appId: "1:176790808601:web:af5bbe0fee206d74b86288",
+    measurementId: "G-JPSKNHEVJT"
+};
 
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 // DOM elements
 const profilesContainer = document.getElementById("profilesContainer");
@@ -352,8 +353,8 @@ const profileCount = document.getElementById("profileCount");
 const searchInput = document.getElementById("searchInput");
 const searchButton = document.getElementById("searchButton");
 
-
-      function formatTimeAgo(timestamp) {
+// Function to format time ago
+function formatTimeAgo(timestamp) {
     const now = Date.now();
     const diffInSeconds = Math.floor((now - timestamp) / 1000);
     
@@ -434,12 +435,9 @@ function createAvatar(profile, userId) {
                 const statusBubble = document.createElement('div');
                 statusBubble.className = 'status-bubble';
                 statusBubble.innerHTML = `
-               <span class=''> ${statusData.text}</span>
-                <br>&nbsp;
-              <small>(${formatTimeAgo(statusData.timestamp)})</small>`;
-                
-                
-                
+                    <span>${statusData.text}</span>
+                    <br>
+                    <small>(${formatTimeAgo(statusData.timestamp)})</small>`;
                 avatarContainer.appendChild(statusBubble);
             }
         }
@@ -447,7 +445,44 @@ function createAvatar(profile, userId) {
     });
 }
 
-      function shuffleArray(array) {
+// Function to perform search
+function performSearch() {
+    const searchValue = searchInput.value.toLowerCase();
+    const cards = profilesContainer.querySelectorAll(".profile-card");
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const nameElement = card.querySelector('.names');
+        const nicknameElement = card.querySelector('.text-indigo-600');
+        const hobbyElement = card.querySelector('[data-name="hobby"]');
+        const secElement = card.querySelector('[data-name="sec"]');
+        
+        const name = nameElement ? nameElement.textContent.toLowerCase() : '';
+        const nickname = nicknameElement ? nicknameElement.textContent.toLowerCase() : '';
+        const hobby = hobbyElement ? hobbyElement.textContent.toLowerCase() : '';
+        const secText = secElement ? secElement.textContent.toLowerCase() : '';
+        
+        if (name.includes(searchValue) || nickname.includes(searchValue) || hobby.includes(searchValue) || secText.includes(searchValue)) {
+            card.style.display = "block";
+            visibleCount++;
+        } else {
+            card.style.display = "none";
+        }
+    });
+    
+    profileCount.textContent = visibleCount;
+    
+    if (visibleCount === 0) {
+        emptyState.classList.remove("hidden");
+        profilesContainer.classList.add("hidden");
+    } else {
+        emptyState.classList.add("hidden");
+        profilesContainer.classList.remove("hidden");
+    }
+}
+
+// Function to shuffle an array (Fisher-Yates algorithm)
+function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
@@ -455,158 +490,145 @@ function createAvatar(profile, userId) {
     return array;
 }
 
-
-    // Updated performSearch function to handle section filtering
-    function performSearch() {
-        const searchValue = searchInput.value.toLowerCase();
-        const cards = profilesContainer.querySelectorAll(".profile-card");
-        let visibleCount = 0;
+// Fetch and render profiles
+function loadProfiles() {
+    database.ref("accounts").once("value", (snapshot) => {
+        const profilesData = snapshot.val();
+        profilesContainer.innerHTML = ""; // clear existing
+        let count = 0;
         
-        // Define our section mappings
-        const sectionMap = {
-            'alpha': 'a',
-            'binary': 'b',
-            'cipher': 'c'  // or whatever your default code is
-        };
-        
-        cards.forEach(card => {
-            const nameElement = card.querySelector('.names');
-            const nicknameElement = card.querySelector('.text-indigo-600');
-            const hobbyElement = card.querySelector('[data-name="hobby"]');
-            const secBadge = card.querySelector('.hobby-badge');
+        if (profilesData) {
+            // Convert object to array and shuffle randomly
+            const profilesArray = shuffleArray(Object.entries(profilesData));
             
-            const name = nameElement ? nameElement.textContent.toLowerCase() : '';
-            const nickname = nicknameElement ? nicknameElement.textContent.toLowerCase() : '';
-            const hobby = hobbyElement ? hobbyElement.textContent.toLowerCase() : '';
-            const secValue = secBadge ? secBadge.getAttribute('data-sec') : '';
+            // Array to hold all avatar creation promises
+            const avatarPromises = [];
             
-            // Check if search matches any field or specifically a section
-            const matchesName = name.includes(searchValue);
-            const matchesNickname = nickname.includes(searchValue);
-            const matchesHobby = hobby.includes(searchValue);
-            
-            // Special handling for section search
-            let matchesSection = false;
-            if (searchValue === 'alpha' || searchValue === 'binary' || searchValue === 'cipher') {
-                matchesSection = secValue === sectionMap[searchValue];
-            } else {
-                // Fallback to regular text search in section badge
-                const secText = secBadge ? secBadge.textContent.toLowerCase() : '';
-                matchesSection = secText.includes(searchValue);
-            }
-            
-            if (matchesName || matchesNickname || matchesHobby || matchesSection) {
-                card.style.display = "block";
-                visibleCount++;
-            } else {
-                card.style.display = "none";
-            }
-        });
-        
-        profileCount.textContent = visibleCount;
-        
-        if (visibleCount === 0) {
-            emptyState.classList.remove("hidden");
-            profilesContainer.classList.add("hidden");
-        } else {
-            emptyState.classList.add("hidden");
-            profilesContainer.classList.remove("hidden");
-        }
-    }
-
-    // Updated profile card creation to include data-sec attribute
-    function loadProfiles() {
-        database.ref("accounts").once("value", (snapshot) => {
-            const profilesData = snapshot.val();
-            profilesContainer.innerHTML = "";
-            let count = 0;
-            
-            if (profilesData) {
-                const profilesArray = shuffleArray(Object.entries(profilesData));
-                const avatarPromises = [];
+            // Create and append profile cards
+            profilesArray.forEach(([userId, profile]) => {
+                if (!profile) return; // Skip if profile is null/undefined
                 
-                profilesArray.forEach(([userId, profile]) => {
-                    if (!profile) return;
-                    
-                    const card = profileTemplate.content.cloneNode(true);
-                    const header = card.querySelector('.bg-white');
-                    const nameContainer = card.querySelector('.flex-col.items-center');
-                    
-                    // Add name and nickname
-                    const nameElement = document.createElement('h3');
-                    nameElement.className = 'names';
-                    nameElement.textContent = profile.fullName || "Unknown Name";
-                    
-                    const nicknameElement = document.createElement('p');
-                    nicknameElement.className = 'text-indigo-600';
-                    nicknameElement.textContent = profile.nickname ? `@${profile.nickname}` : "@unknown";
-                    
-                    nameContainer.appendChild(nameElement);
-                    nameContainer.appendChild(nicknameElement);
-                    
-                    // Fill profile data
-                    card.querySelector('[data-name="email"]').textContent = profile.email || "Not provided";
-                    card.querySelector('[data-name="hobby"]').textContent = profile.hobby || "No hobby specified";
-                    card.querySelector('[data-name="bio"]').textContent = profile.bio || "No bio provided";
-                    
-                    // Handle section badge with both display text and raw value
-                    const badge = card.querySelector('.hobby-badge');
-                    const secText = badge.querySelector('[data-name="sec"]');
-                    
-                    // Store raw value in data attribute
-                    badge.setAttribute('data-sec', profile.sec || '');
-                    
-                    // Set display text
-                    if (profile.sec === 'a') {
-                        badge.style.backgroundColor = '#D1FAE5';
-                        secText.textContent = 'Alpha';
-                        secText.style.color = '#065F46';
-                    } else if (profile.sec === 'b') {
-                        badge.style.backgroundColor = '#FECACA';
-                        secText.textContent = 'Binary';
-                        secText.style.color = '#7F1D1D';
-                    } else {
-                        badge.style.backgroundColor = '#E0F2FE';
-                        secText.textContent = 'Cipher';
-                        secText.style.color = '#0369A1';
+                const card = profileTemplate.content.cloneNode(true);
+                const header = card.querySelector('.bg-white');
+                const nameContainer = card.querySelector('.flex-col.items-center');
+                
+                // Add name and nickname
+                const nameElement = document.createElement('h3');
+                nameElement.className = 'names';
+                nameElement.textContent = profile.fullName || "Unknown Name";
+                nameElement.setAttribute('data-name', 'fullName');
+                
+                const nicknameElement = document.createElement('p');
+                nicknameElement.className = 'text-indigo-600';
+                nicknameElement.textContent = profile.nickname ? `@${profile.nickname}` : "@unknown";
+                nicknameElement.setAttribute('data-name', 'nickname');
+                
+                nameContainer.appendChild(nameElement);
+                nameContainer.appendChild(nicknameElement);
+                
+                // Fill in profile data
+                card.querySelector('[data-name="email"]').textContent = profile.email || "Not provided";
+                card.querySelector('[data-name="hobby"]').textContent = profile.hobby || "No hobby specified";
+                card.querySelector('[data-name="bio"]').textContent = profile.bio || "No bio provided";
+                card.querySelector('[data-name="sec"]').textContent = profile.sec || "Not verified";
+                
+                // Style the badge based on sec value
+                const badge = card.querySelector('.hobby-badge');
+                const secText = badge.querySelector('[data-name="sec"]');
+                
+                if (profile.sec === 'a') {
+                    badge.style.backgroundColor = '#D1FAE5'; // soft green
+                    badge.style.color = '#065F46';
+                    secText.textContent = 'Alpha';
+                    secText.style.color = '#065F46';
+                } else if (profile.sec === 'b') {
+                    badge.style.backgroundColor = '#FECACA'; // soft red
+                    badge.style.color = '#7F1D1D';
+                    secText.textContent = 'Binary';
+                    secText.style.color = '#7F1D1D';
+                } else {
+                    badge.style.backgroundColor = '#E0F2FE'; // soft blue
+                    badge.style.color = '#0369A1';
+                    secText.textContent = 'Cipher';
+                    secText.style.color = '#0369A1';
+                }
+                
+                // Handle Facebook profile link
+                const fbLink = card.querySelector('[data-name="fbProfile"]');
+                if (profile.fbProfile) {
+                    fbLink.href = profile.fbProfile;
+                } else {
+                    fbLink.parentElement.style.display = "none";
+                }
+                
+                // Hide hobby if not provided
+                if (!profile.hobby) {
+                    card.querySelector('[data-name="hobbyContainer"]').style.display = "none";
+                }
+                if (!profile.sec) {
+                    card.querySelector('[data-name="secc"]').style.display = "none";
+                }
+                
+                // Update the "Last updated" time
+                if (profile.updatedAt) {
+                    const timeAgoElement = card.querySelector('#uw');
+                    if (timeAgoElement) {
+                        timeAgoElement.textContent = formatTimeAgo(profile.updatedAt);
                     }
-                    
-                    // Rest of the profile creation code...
-                    
-                    const avatarPromise = createAvatar(profile, userId).then(avatar => {
-                        header.appendChild(avatar);
-                        profilesContainer.appendChild(card);
-                        count++;
-                    });
-                    
-                    avatarPromises.push(avatarPromise);
+                } else {
+                    const timeAgoElement = card.querySelector('#uw');
+                    if (timeAgoElement) {
+                        timeAgoElement.textContent = "a long time ago.";
+                    }
+                }
+                
+                // Create avatar with status check
+                const avatarPromise = createAvatar(profile, userId).then(avatar => {
+                    header.appendChild(avatar);
+                    profilesContainer.appendChild(card);
+                    count++;
                 });
                 
-                Promise.all(avatarPromises).then(() => {
-                    profileCount.textContent = count;
-                    loadingState.classList.add("hidden");
-                    
-                    if (count > 0) {
-                        profilesContainer.classList.remove("hidden");
-                        emptyState.classList.add("hidden");
-                    } else {
-                        profilesContainer.classList.add("hidden");
-                        emptyState.classList.remove("hidden");
-                    }
-                });
-            } else {
+                avatarPromises.push(avatarPromise);
+            });
+            
+            // Wait for all avatars to be created before showing the container
+            Promise.all(avatarPromises).then(() => {
+                profileCount.textContent = count;
                 loadingState.classList.add("hidden");
-                emptyState.classList.remove("hidden");
-            }
-        }).catch(error => {
-            console.error("Error loading profiles:", error);
+                
+                if (count > 0) {
+                    profilesContainer.classList.remove("hidden");
+                    emptyState.classList.add("hidden");
+                } else {
+                    profilesContainer.classList.add("hidden");
+                    emptyState.classList.remove("hidden");
+                }
+            });
+        } else {
             loadingState.classList.add("hidden");
             emptyState.classList.remove("hidden");
-        });
+        }
+    }).catch(error => {
+        console.error("Error loading profiles:", error);
+        loadingState.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+    });
+}
+
+// Search event handlers
+searchInput.addEventListener("input", performSearch);
+searchButton.addEventListener("click", performSearch);
+
+// Also search when Enter key is pressed
+searchInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        performSearch();
     }
+});
+
+// Initial load
 loadProfiles();
-    // Rest of the code remains the same...
-</script>
     
     <br><br><br>
     
