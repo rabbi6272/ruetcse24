@@ -328,7 +328,7 @@
     </template>
 
   <script>
- // Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAov5QhTpQ_1svMOFgWsg3E8tRalKrbs2U",
     authDomain: "last-197cd.firebaseapp.com",
@@ -447,7 +447,7 @@ function createAvatar(profile, userId) {
 
 // Function to perform search
 function performSearch() {
-    const searchValue = searchInput.value.toLowerCase();
+    const searchValue = searchInput.value.toLowerCase().trim();
     const cards = profilesContainer.querySelectorAll(".profile-card");
     let visibleCount = 0;
     
@@ -460,9 +460,24 @@ function performSearch() {
         const name = nameElement ? nameElement.textContent.toLowerCase() : '';
         const nickname = nicknameElement ? nicknameElement.textContent.toLowerCase() : '';
         const hobby = hobbyElement ? hobbyElement.textContent.toLowerCase() : '';
-        const secText = secElement ? secElement.textContent.toLowerCase() : '';
+        let secText = '';
         
-        if (name.includes(searchValue) || nickname.includes(searchValue) || hobby.includes(searchValue) || secText.includes(searchValue)) {
+        // Map sec value to display text for search
+        if (secElement) {
+            const secValue = secElement.textContent.toLowerCase();
+            if (secValue === 'alpha') {
+                secText = 'alpha';
+            } else if (secValue === 'binary') {
+                secText = 'binary';
+            } else if (secValue === 'cipher') {
+                secText = 'cipher';
+            }
+        }
+        
+        if (name.includes(searchValue) || 
+            nickname.includes(searchValue) || 
+            hobby.includes(searchValue) || 
+            secText.includes(searchValue)) {
             card.style.display = "block";
             visibleCount++;
         } else {
