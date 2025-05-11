@@ -342,6 +342,111 @@
     firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+
+// DOM elements
+const profilesContainer = document.getElementById("profilesContainer");
+const loadingState = document.getElementById("loadingState");
+const emptyState = document.getElementById("emptyState");
+const profileTemplate = document.getElementById("profileTemplate");
+const profileCount = document.getElementById("profileCount");
+const searchInput = document.getElementById("searchInput");
+const searchButton = document.getElementById("searchButton");
+
+
+      function formatTimeAgo(timestamp) {
+    const now = Date.now();
+    const diffInSeconds = Math.floor((now - timestamp) / 1000);
+    
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds} sec${diffInSeconds === 1 ? '' : 's'} ago`;
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+        return `${diffInMinutes} min${diffInMinutes === 1 ? '' : 's'} ago`;
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+        return `${diffInHours} hour${diffInHours === 1 ? '' : 's'} ago`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) {
+        return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`;
+    }
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+        return `${diffInMonths} month${diffInMonths === 1 ? '' : 's'} ago`;
+    }
+    
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `${diffInYears} year${diffInYears === 1 ? '' : 's'} ago`;
+}
+
+// Function to create avatar element
+function createAvatar(profile, userId) {
+    const avatarContainer = document.createElement('div');
+    avatarContainer.className = 'relative w-full h-full flex items-center justify-center';
+    
+    if (profile.profilePicUrl) {
+        const img = document.createElement('img');
+        img.src = profile.profilePicUrl;
+        img.alt = profile.fullName || 'Profile';
+        img.className = 'avatar';
+        
+        if (profile.fbProfile) {
+            const link = document.createElement('a');
+            link.href = profile.fbProfile;
+            link.target = '_blank';
+            link.appendChild(img);
+            avatarContainer.appendChild(link);
+        } else {
+            avatarContainer.appendChild(img);
+        }
+    } else {
+        // Fallback to initials if no image
+        const initialsDiv = document.createElement('div');
+        initialsDiv.className = 'avatar bg-indigo-500 text-white flex items-center justify-center text-2xl font-bold';
+        initialsDiv.textContent = profile.fullName ? profile.fullName.charAt(0).toUpperCase() : '?';
+        
+        if (profile.fbProfile) {
+            const link = document.createElement('a');
+            link.href = profile.fbProfile;
+            link.target = '_blank';
+            link.appendChild(initialsDiv);
+            avatarContainer.appendChild(link);
+        } else {
+            avatarContainer.appendChild(initialsDiv);
+        }
+    }
+    
+    // Check for active status (within 24 hours)
+    return database.ref("statuses/" + userId).once("value").then(statusSnapshot => {
+        if (statusSnapshot.exists()) {
+            const statusData = statusSnapshot.val();
+            const now = new Date().getTime();
+            const statusTime = new Date(statusData.timestamp).getTime();
+            const hoursDiff = (now - statusTime) / (1000 * 60 * 60);
+            
+            if (hoursDiff < 24) {
+                const statusBubble = document.createElement('div');
+                statusBubble.className = 'status-bubble';
+                statusBubble.innerHTML = `
+               <span class=''> ${statusData.text}</span>
+                <br>&nbsp;
+              <small>(${formatTimeAgo(statusData.timestamp)})</small>`;
+                
+                
+                
+                avatarContainer.appendChild(statusBubble);
+            }
+        }
+        return avatarContainer;
+    });
+}
+
       function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
