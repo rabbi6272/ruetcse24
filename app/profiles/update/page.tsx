@@ -68,7 +68,7 @@ export default function StudentPortal() {
         pincode: user.pincode,
         sec: user.sec || "",
         profilePicUrl: user.profilePicUrl,
-        profilePicPublicId: user.profilePicPublicId || null,
+        profilePicPublicId: user.profilePicPublicId || "",
         createdAt: user.createdAt,
         roll: user.roll,
       });

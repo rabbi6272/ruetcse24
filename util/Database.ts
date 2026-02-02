@@ -37,15 +37,15 @@ export async function createUser(
   const ref = await addDoc(collection(db, USERS_COLLECTION), cleanData);
   const snap = await getDoc(ref);
   if (!snap.exists()) throw new Error("Failed to create user");
-  return docToStudent(snap.data());
+  return docToStudent({ ...snap.data(), id: snap.id });
 }
 
 export async function getAllUsers(): Promise<Student[]> {
   const snaps = await getDocs(collection(db, USERS_COLLECTION));
   if (snaps.empty) throw new Error("Document does not exist");
-  const users = [];
+  const users: Student[] = [];
   snaps.forEach((docSnap) => {
-    users.push(docToStudent(docSnap.data()));
+    users.push(docToStudent({ ...docSnap.data(), id: docSnap.id }));
   });
   return users;
 }
@@ -54,7 +54,7 @@ export async function getUserById(id: string): Promise<Student | null> {
   const ref = doc(db, USERS_COLLECTION, id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  return docToStudent(snap.data());
+  return docToStudent({ ...snap.data(), id: snap.id });
 }
 
 export async function updateUser(
@@ -68,7 +68,7 @@ export async function updateUser(
   await updateDoc(ref, payload);
   const updatedSnap = await getDoc(ref);
   if (!updatedSnap.exists()) return null;
-  return docToStudent(updatedSnap.data());
+  return docToStudent({ ...updatedSnap.data(), id: updatedSnap.id });
 }
 
 export async function deleteUser(id: string): Promise<boolean> {
