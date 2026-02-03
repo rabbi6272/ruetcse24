@@ -9,8 +9,6 @@ body,
 body {
   margin: 0;
   padding: 0;
-  background: #0f172a;
-  color: #fff;
 }
 .name {
   position: absolute;
@@ -49,4 +47,16 @@ body {
 
 .profiles-button {
   animation: blow 1.5s infinite;
+}
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.loader {
+  border-top-color: #6366f1;
+  animation: spinner 1.5s linear infinite;
 }

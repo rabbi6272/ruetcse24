@@ -7,7 +7,7 @@ import styles from "./StudentManager.module.css";
 import { ProfileCard } from "./ProfileCard";
 import { getAllUsers } from "../../util/Database";
 
-import type { Student } from "../../util/Database";
+import type { Student } from "../../types/Student";
 
 export default function StudentManager() {
   const [studentsList, setStudentsList] = useState<Student[]>([]);
@@ -34,6 +34,7 @@ export default function StudentManager() {
         student.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.nickname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.roll?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.hobby?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesSection =

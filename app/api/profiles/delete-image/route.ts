@@ -9,46 +9,48 @@ cloudinary.config({
 
 export async function DELETE(request: Request) {
   const { publicId } = await request.json();
-  
+
   if (!publicId) {
     return NextResponse.json(
       { error: "PublicId is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   try {
     // Remove file extension if present
     const cleanPublicId = publicId.replace(/\.[^/.]+$/, "");
-    
+
     // If publicId doesn't include the folder, prepend it
-    const fullPublicId = cleanPublicId.startsWith('Users/') 
-      ? cleanPublicId 
+    const fullPublicId = cleanPublicId.startsWith("Users/")
+      ? cleanPublicId
       : `Users/${cleanPublicId}`;
-    
-    const result = await cloudinary.uploader.destroy(fullPublicId);
-    
+
+    const result = await cloudinary.uploader.destroy(fullPublicId, {
+      resource_type: "image",
+    });
+
     if (result.result === "ok") {
       return NextResponse.json(
         { message: "Image deleted successfully" },
-        { status: 200 }
+        { status: 200 },
       );
     } else if (result.result === "not found") {
       return NextResponse.json(
         { error: "Image not found in Cloudinary" },
-        { status: 404 }
+        { status: 404 },
       );
     } else {
       return NextResponse.json(
         { error: "Failed to delete image from Cloudinary", result },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (error) {
     console.error("Error deleting image from Cloudinary:", error);
     return NextResponse.json(
       { error: "An error occurred while deleting the image" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

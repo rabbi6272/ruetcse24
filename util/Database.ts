@@ -5,27 +5,14 @@ import {
   addDoc,
   getDoc,
   getDocs,
+  query,
+  where,
   updateDoc,
   deleteDoc,
   DocumentData,
 } from "firebase/firestore";
 
-export interface Student {
-  id: string;
-  bio?: string;
-  createdAt: number;
-  email: string;
-  fbProfile?: string;
-  fullName: string;
-  hobby?: string;
-  nickname: string;
-  pincode: string;
-  profilePicUrl?: string;
-  profilePicPublicId?: string;
-  roll: string;
-  sec?: string;
-  updatedAt?: number;
-}
+import { Student } from "../types/Student";
 
 const USERS_COLLECTION = "users";
 
@@ -50,11 +37,13 @@ export async function getAllUsers(): Promise<Student[]> {
   return users;
 }
 
-export async function getUserById(id: string): Promise<Student | null> {
-  const ref = doc(db, USERS_COLLECTION, id);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return docToStudent({ ...snap.data(), id: snap.id });
+export async function getUserByEmail(email: string): Promise<Student | null> {
+  const ref = collection(db, USERS_COLLECTION);
+  const q = query(ref, where("email", "==", email));
+  const snaps = await getDocs(q);
+  if (snaps.empty) return null;
+  const first = snaps.docs[0];
+  return docToStudent({ ...first.data(), id: first.id });
 }
 
 export async function updateUser(

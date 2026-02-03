@@ -1,7 +1,8 @@
-import Image from "next/image";
 import styles from "./StudentManager.module.css";
 import Link from "next/link";
+
 import { nunito } from "../ui/fonts";
+
 import { CldImage } from "next-cloudinary";
 
 export type ProfileCardProps = {
@@ -42,13 +43,13 @@ export function ProfileCard({
       className={`${styles["profile-card"]} relative rounded-xl shadow-sm overflow-hidden hover:shadow-md ${styles["card-border"]}`}
     >
       {/* Profile Image */}
-      <div className="h-auto flex items-center justify-center p-4 ">
-        <div className="rounded-full h-30 w-30 ring-2 ring-indigo-500  relative">
+      <div className="h-auto flex items-center justify-center px-3 pt-3">
+        <div className="rounded-full ring-2 ring-indigo-500 relative">
           {imageSrc ? (
             <CldImage
               crop="fill"
-              width={120}
-              height={120}
+              width={140}
+              height={140}
               gravity="face"
               src={imageSrc}
               alt="Profile Preview"
@@ -66,7 +67,7 @@ export function ProfileCard({
         </div>
       </div>
 
-      <div className="p-5">
+      <div className="p-4">
         {/* Name and Nickname */}
         <div className="flex flex-col items-center text-center">
           <h3
@@ -86,7 +87,7 @@ export function ProfileCard({
         </div>
 
         {/* Bio */}
-        <div className="mt-2 pt-4 border-t border-gray-100 flex items-start gap-2">
+        <div className="pt-4 border-t border-gray-100 flex items-start gap-2">
           <i style={{ fontSize: "15px", color: "gray" }} className="fa">
             &#xf10d;
           </i>
