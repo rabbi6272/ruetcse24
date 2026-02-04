@@ -22,9 +22,13 @@ export async function createUser(
   const now = Date.now();
   const cleanData = { ...userData, createdAt: now, updatedAt: now };
   const ref = await addDoc(collection(db, USERS_COLLECTION), cleanData);
+
+  // Update the document to include its own ID
+  await updateDoc(ref, { id: ref.id });
+
   const snap = await getDoc(ref);
   if (!snap.exists()) throw new Error("Failed to create user");
-  return docToStudent({ ...snap.data(), id: snap.id });
+  return docToStudent(snap.data() as DocumentData);
 }
 
 export async function getAllUsers(): Promise<Student[]> {
@@ -32,7 +36,7 @@ export async function getAllUsers(): Promise<Student[]> {
   if (snaps.empty) throw new Error("Document does not exist");
   const users: Student[] = [];
   snaps.forEach((docSnap) => {
-    users.push(docToStudent({ ...docSnap.data(), id: docSnap.id }));
+    users.push(docToStudent(docSnap.data() as DocumentData));
   });
   return users;
 }
@@ -43,7 +47,7 @@ export async function getUserByEmail(email: string): Promise<Student | null> {
   const snaps = await getDocs(q);
   if (snaps.empty) return null;
   const first = snaps.docs[0];
-  return docToStudent({ ...first.data(), id: first.id });
+  return docToStudent(first.data() as DocumentData);
 }
 
 export async function updateUser(
@@ -57,7 +61,7 @@ export async function updateUser(
   await updateDoc(ref, payload);
   const updatedSnap = await getDoc(ref);
   if (!updatedSnap.exists()) return null;
-  return docToStudent({ ...updatedSnap.data(), id: updatedSnap.id });
+  return docToStudent(updatedSnap.data() as DocumentData);
 }
 
 export async function deleteUser(id: string): Promise<boolean> {

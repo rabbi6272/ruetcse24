@@ -117,7 +117,7 @@ export default function StudentManager() {
             ? null
             : filteredData.map((student) => (
                 <ProfileCard
-                  key={student.email}
+                  key={student.id}
                   name={student.fullName}
                   nickname={student.nickname}
                   imageSrc={student.profilePicUrl || null}
