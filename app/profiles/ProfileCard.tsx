@@ -1,4 +1,3 @@
-import styles from "./StudentManager.module.css";
 import Link from "next/link";
 
 import { nunito } from "../ui/fonts";
@@ -14,18 +13,7 @@ export type ProfileCardProps = {
   email?: string | null;
   hobby?: string | null;
   fbUrl?: string | null;
-  updatedAt?: string | Date | null;
 };
-
-function formatTimeAgo(updatedAt?: string | Date | null) {
-  if (!updatedAt) return "0 mins ago";
-  const d = typeof updatedAt === "string" ? new Date(updatedAt) : updatedAt;
-  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (diff < 60) return `${diff} secs ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-  return `${Math.floor(diff / 86400)} days ago`;
-}
 
 export function ProfileCard({
   name = "Anonymous",
@@ -36,11 +24,10 @@ export function ProfileCard({
   email = "email@example.com",
   hobby = "Hobby not specified",
   fbUrl = "#",
-  updatedAt = null,
 }: ProfileCardProps) {
   return (
     <div
-      className={`${styles["profile-card"]} relative rounded-xl shadow-sm overflow-hidden hover:shadow-md ${styles["card-border"]}`}
+      className={`profile-card relative rounded-xl shadow-sm overflow-hidden hover:shadow-md card-border`}
     >
       {/* Profile Image */}
       <div className="h-auto flex items-center justify-center px-3 pt-3">
@@ -71,19 +58,19 @@ export function ProfileCard({
         {/* Name and Nickname */}
         <div className="flex flex-col items-center text-center">
           <h3
-            className={`text-xl text-gray-600 font-bold ${nunito.className}`}
+            className={`text-xl text-gray-700 font-bold ${nunito.className}`}
             data-name="name"
           >
             {name}
           </h3>
-          {nickname ? (
+          {nickname && (
             <span
-              className={`text-sm text-gray-500 mt-2 ${nunito.className}`}
+              className={`text-sm text-gray-600 mt-2 ${nunito.className}`}
               data-name="nickname"
             >
               {nickname}
             </span>
-          ) : null}
+          )}
         </div>
 
         {/* Bio */}
@@ -91,17 +78,14 @@ export function ProfileCard({
           <i style={{ fontSize: "15px", color: "gray" }} className="fa">
             &#xf10d;
           </i>
-          <p
-            className={`text-md text-gray-500 ${styles["bio-text"]}`}
-            data-name="bio"
-          >
+          <p className={`text-md text-gray-500 bio-text`} data-name="bio">
             {bio}
           </p>
         </div>
 
         {/* Section Badge */}
         <div
-          className={`${styles["hobby-badge"]} px-2.5 py-1 absolute top-2.5 right-2.5 z-9999999 `}
+          className={`hobby-badge px-2.5 py-1 absolute top-2.5 right-2.5 z-9999999 `}
           data-name="sectionContainer"
         >
           <i className="fas fa-bookmark"></i>
@@ -138,10 +122,6 @@ export function ProfileCard({
               &nbsp; Facebook Profile
             </Link>
           </div>
-          {/* 
-          <span className="text-gray-400 text-xs">
-            Updated <span id="uw">{formatTimeAgo(updatedAt)}</span>
-          </span> */}
         </div>
       </div>
     </div>

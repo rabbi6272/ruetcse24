@@ -1,6 +1,7 @@
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { lato } from "./ui/fonts";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "CSE-24 | RUET",
@@ -26,6 +27,7 @@ export default function RootLayout({
       </head>
       <body className={`${lato.className}`}>
         <Toaster />
+        <Analytics />
         {children}
       </body>
     </html>

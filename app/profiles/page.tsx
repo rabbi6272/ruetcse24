@@ -3,33 +3,36 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-import styles from "./StudentManager.module.css";
 import { ProfileCard } from "./ProfileCard";
 import { getAllUsers } from "../../util/Database";
 
 import type { Student } from "../../types/Student";
+import { useStudentStore } from "../../store/StudentStore";
 
 export default function StudentManager() {
-  const [studentsList, setStudentsList] = useState<Student[]>([]);
+  // const [studentsList, setStudentsList] = useState<Student[]>([]);
   const [filteredData, setFilteredData] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sectionFilter, setSectionFilter] = useState("all");
+
+  const allStudents = useStudentStore((state) => state.allStudents);
+  const setAllStudents = useStudentStore((state) => state.setAllStudents);
 
   // Filter students when search or filter changes
   useEffect(() => {
     async function fetchUsers() {
+      if (allStudents.length > 0) return;
       const res = await getAllUsers();
-      setStudentsList(res);
+      setAllStudents(res);
     }
     fetchUsers();
   }, []);
 
   useEffect(() => {
     filterStudents();
-  }, [searchTerm, sectionFilter, studentsList]);
+  }, [searchTerm, allStudents]);
 
   const filterStudents = () => {
-    const filtered = studentsList.filter((student) => {
+    const filtered = allStudents.filter((student) => {
       const matchesSearch =
         student.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.nickname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,14 +40,14 @@ export default function StudentManager() {
         student.roll?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.hobby?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesSection =
-        sectionFilter === "all"
-          ? true
-          : sectionFilter === "none"
-            ? !student.sec
-            : student.sec === sectionFilter;
+      // const matchesSection =
+      //   sectionFilter === "all"
+      //     ? true
+      //     : sectionFilter === "none"
+      //       ? !student.sec
+      //       : student.sec === sectionFilter;
 
-      return matchesSearch && matchesSection;
+      return matchesSearch;
     });
 
     setFilteredData(filtered);
@@ -89,7 +92,7 @@ export default function StudentManager() {
               />
               <button
                 id="searchButton"
-                className={`${styles["search-btn"]} bg-indigo-600 text-white px-4 py-2 rounded-r-full hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+                className={`search-btn bg-indigo-600 text-white px-4 py-2 rounded-r-full hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
               >
                 Search
               </button>
@@ -126,13 +129,6 @@ export default function StudentManager() {
                   email={student.email}
                   hobby={student.hobby || null}
                   fbUrl={student.fbProfile || null}
-                  updatedAt={
-                    student.updatedAt
-                      ? new Date(student.updatedAt)
-                      : student.createdAt
-                        ? new Date(student.createdAt)
-                        : null
-                  }
                 />
               ))}
         </div>
