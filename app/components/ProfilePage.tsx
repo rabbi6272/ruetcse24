@@ -2,6 +2,7 @@ import { CldImage } from "next-cloudinary";
 import { ImageUploadModal } from "./ImageUploadModal";
 
 import type { Student } from "../../types/Student";
+import { Spinner } from "@heroui/react";
 
 export function ProfilePage({
   handleLogout,
@@ -165,6 +166,56 @@ export function ProfilePage({
 
         <div>
           <label
+            htmlFor="updateBloodGroup"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Blood Group (Must)
+          </label>
+          <input
+            type="text"
+            id="updateBloodGroup"
+            value={profileData?.bloodGroup ?? ""}
+            onChange={(e) =>
+              setProfileData((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      bloodGroup: e.target.value.toUpperCase(),
+                    }
+                  : prev,
+              )
+            }
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="updateMobileNumber"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Mobile Number (Must)
+          </label>
+          <input
+            type="text"
+            id="updateMobileNumber"
+            value={profileData?.mobileNumber ?? ""}
+            onChange={(e) =>
+              setProfileData((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      mobileNumber: e.target.value,
+                    }
+                  : prev,
+              )
+            }
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label
             htmlFor="updateHobby"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
@@ -288,10 +339,8 @@ export function ProfilePage({
             disabled={updateLoading}
             className="flex-1 bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors"
           >
+            {updateLoading && <Spinner color="current" />}
             <span>{updateLoading ? "Updating..." : "Update Profile"}</span>
-            {updateLoading && (
-              <div className="loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
-            )}
           </button>
           <button
             type="button"

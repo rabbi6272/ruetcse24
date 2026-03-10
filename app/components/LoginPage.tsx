@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Spinner } from "@heroui/react";
 
 export function LoginPage({
   handleLogin,
@@ -69,10 +70,8 @@ export function LoginPage({
             disabled={loginLoading}
             className="w-full bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors"
           >
+            {loginLoading && <Spinner color="current" />}
             <span>{loginLoading ? "Logging in..." : "Login"}</span>
-            {loginLoading && (
-              <div className="loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
-            )}
           </button>
         </div>
       </form>

@@ -1,16 +1,18 @@
 export interface Student {
   id: string;
-  bio?: string;
-  createdAt: number;
-  email: string;
-  fbProfile?: string;
   fullName: string;
-  hobby?: string;
   nickname: string;
+  email: string;
   pincode: string;
+  roll: string;
+  bio?: string;
+  bloodGroup?: string;
+  fbProfile?: string;
+  mobileNumber?: string;
+  hobby?: string;
   profilePicUrl?: string;
   profilePicPublicId?: string;
-  roll: string;
   sec?: string;
+  createdAt: number;
   updatedAt?: number;
 }

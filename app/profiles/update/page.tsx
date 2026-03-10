@@ -9,6 +9,7 @@ import { getAllUsers, updateUser } from "../../../util/Database";
 import type { Student } from "../../../types/Student";
 import { LoginPage } from "../../components/LoginPage";
 import { ProfilePage } from "../../components/ProfilePage";
+import { useStudentStore } from "../../../store/StudentStore";
 
 // Maximum file size (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -23,6 +24,9 @@ export default function StudentPortal() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
 
+  // Zustand store
+  const updateStudentInStore = useStudentStore((state) => state.updateStudent);
+
   // Profile form data
   const [profileData, setProfileData] = useState<Student>({
     id: "",
@@ -30,6 +34,9 @@ export default function StudentPortal() {
     nickname: "",
     email: "",
     hobby: "",
+    roll: "",
+    mobileNumber: "",
+    bloodGroup: "",
     fbProfile: "",
     bio: "",
     pincode: "",
@@ -37,7 +44,6 @@ export default function StudentPortal() {
     profilePicUrl: "",
     profilePicPublicId: "",
     createdAt: Date.now(),
-    roll: "",
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -70,6 +76,8 @@ export default function StudentPortal() {
         profilePicPublicId: user.profilePicPublicId || "",
         createdAt: user.createdAt,
         roll: user.roll,
+        bloodGroup: user.bloodGroup || "",
+        mobileNumber: user.mobileNumber || "",
       });
       toast.success("Login successful!");
     } catch (err) {
@@ -97,10 +105,12 @@ export default function StudentPortal() {
       profilePicUrl: "",
       createdAt: Date.now(),
       roll: "",
+      bloodGroup: "",
+      mobileNumber: "",
     });
   };
 
-  // Handle profile update (use server API)
+  // Handle profile update
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setUpdateLoading(true);
@@ -118,6 +128,8 @@ export default function StudentPortal() {
         return;
       }
       setProfileData(updated);
+      // Update the store to reflect changes in the profiles page
+      updateStudentInStore(updated.id, updated);
       toast.success("Profile updated successfully!");
     } catch (err) {
       toast.error("Update failed");
@@ -194,6 +206,8 @@ export default function StudentPortal() {
       });
       if (updated) {
         setProfileData(updated);
+        // Update the store to reflect changes in the profiles page
+        updateStudentInStore(updated.id, updated);
         toast.success("Image uploaded successfully");
       } else {
         toast.error("Failed to update profile with image");

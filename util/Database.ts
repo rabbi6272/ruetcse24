@@ -84,6 +84,8 @@ function docToStudent(data: DocumentData): Student {
     hobby: data.hobby,
     fbProfile: data.fbProfile,
     sec: data.sec,
+    bloodGroup: data.bloodGroup || "",
+    mobileNumber: data.mobileNumber || "",
     profilePicUrl: data.profilePicUrl,
     profilePicPublicId: data.profilePicPublicId,
     createdAt: data.createdAt,

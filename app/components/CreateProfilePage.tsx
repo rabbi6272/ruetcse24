@@ -3,6 +3,7 @@ import { ImageUploadModal } from "./ImageUploadModal";
 
 import type { Student } from "../../types/Student";
 import { User2 } from "lucide-react";
+import { Spinner } from "@heroui/react";
 
 export function CreateProfilePage({
   studentInfo,
@@ -275,10 +276,8 @@ export function CreateProfilePage({
             disabled={createLoading}
             className="flex-1 bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors"
           >
+            {createLoading && <Spinner color="current" />}
             <span>{createLoading ? "Creating..." : "Create Profile"}</span>
-            {createLoading && (
-              <div className="loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
-            )}
           </button>
         </div>
       </form>

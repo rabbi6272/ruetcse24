@@ -28,6 +28,8 @@ export const useStudentStore = create<StudentStore>((set: any) => {
       profilePicPublicId: "",
       createdAt: Date.now(),
       roll: "",
+      bloodGroup: "",
+      mobileNumber: "",
     },
     setStudentInfo: (student: Student) => set({ studentInfo: student }),
     clearStudent: () =>
@@ -46,6 +48,8 @@ export const useStudentStore = create<StudentStore>((set: any) => {
           profilePicPublicId: "",
           createdAt: Date.now(),
           roll: "",
+          bloodGroup: "",
+          mobileNumber: "",
         },
       }),
     allStudents: [],
