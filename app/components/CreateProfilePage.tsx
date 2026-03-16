@@ -152,6 +152,57 @@ export function CreateProfilePage({
 
         <div>
           <label
+            htmlFor="updateMobile"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Mobile*
+          </label>
+          <input
+            type="text"
+            id="updateMobile"
+            value={studentInfo?.mobileNumber}
+            onChange={(e) =>
+              setStudentInfo((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      mobileNumber: e.target.value,
+                    }
+                  : prev,
+              )
+            }
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="updateBloodGroup"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Blood Group*
+          </label>
+          <input
+            type="text"
+            id="updateBloodGroup"
+            placeholder="AB+ | AB- ......"
+            value={studentInfo?.bloodGroup}
+            onChange={(e) =>
+              setStudentInfo((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      bloodGroup: e.target.value,
+                    }
+                  : prev,
+              )
+            }
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label
             htmlFor="updateHobby"
             className="block text-sm font-medium text-gray-700 mb-1"
           >

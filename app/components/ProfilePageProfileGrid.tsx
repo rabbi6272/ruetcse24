@@ -2,11 +2,28 @@ import { Student } from "../../types/Student";
 
 import { ProfileCard } from "./ProfileCard";
 
+import { Skeleton } from "@heroui/react";
+
 export function ProfilePageProfileGrid({
   filteredData,
+  studentsLoading,
 }: {
   filteredData: Student[];
+  studentsLoading: boolean;
 }) {
+  if (studentsLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <Skeleton
+            key={index}
+            animationType="shimmer"
+            className="h-60 w-full rounded-lg bg-white"
+          />
+        ))}
+      </div>
+    );
+  }
   return (
     <div
       id="profilesContainer"

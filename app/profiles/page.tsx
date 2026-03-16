@@ -12,17 +12,27 @@ import { ProfilePageHeader } from "../components/ProfilePageHeader";
 import { ProfilePageSearchAndStats } from "../components/ProfilePageSearch&Stats";
 import { ProfilePageFooter } from "../components/ProfilePageFooter";
 import { ProfilePageProfileGrid } from "../components/ProfilePageProfileGrid";
+import { Navbar } from "../components/Navbar";
 
 export default function StudentManager() {
   const [filteredData, setFilteredData] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [studentsLoading, setStudentsLoading] = useState(false);
+
   const allStudents = useStudentStore((state) => state.allStudents);
   const setAllStudents = useStudentStore((state) => state.setAllStudents);
 
   async function fetchUsers() {
-    const res = await getAllUsers();
-    setAllStudents(res);
+    try {
+      setStudentsLoading(true);
+      const res = await getAllUsers();
+      setAllStudents(res);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setStudentsLoading(false);
+    }
   }
 
   // Fetch users on component mount
@@ -53,7 +63,7 @@ export default function StudentManager() {
   };
 
   return (
-    <main className="min-h-screen p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <ProfilePageHeader />
@@ -66,13 +76,16 @@ export default function StudentManager() {
         />
 
         {/* Profiles Grid */}
-        <ProfilePageProfileGrid filteredData={filteredData} />
+        <ProfilePageProfileGrid
+          filteredData={filteredData}
+          studentsLoading={studentsLoading}
+        />
       </div>
 
       <br />
 
       {/* Footer */}
       <ProfilePageFooter />
-    </main>
+    </div>
   );
 }

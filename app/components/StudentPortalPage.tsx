@@ -2,6 +2,7 @@ import { CldImage } from "next-cloudinary";
 import { ImageUploadModal } from "./ImageUploadModal";
 
 import type { Student } from "../../types/Student";
+
 import { Spinner } from "@heroui/react";
 
 export function StudentPortalPage({
@@ -24,11 +25,11 @@ export function StudentPortalPage({
   handleDeleteAccount: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
+    <div className="bg-white rounded-2xl shadow-lg p-3 lg:p-6 xl:p-8 w-full max-w-2xl">
       <div className="flex items-center justify-between mb-4">
         {/* Header with Logout */}
         <div className="space-y-2">
-          <h1 className="text-3xl text-gray-800">Your Profile</h1>
+          <h1 className="text-2xl lg:text-3xl text-gray-800">Your Profile</h1>
           <button
             onClick={handleLogout}
             className="text-sm px-3.5 py-0.5 rounded-full text-red-500 border border-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300 cursor-pointer"

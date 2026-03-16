@@ -15,8 +15,8 @@
   }
 }
 
-body {
-  /* background-color: ghostwhite; */
+body,
+main {
   background: linear-gradient(
     to right,
     oklch(97% 0.014 254.604),
