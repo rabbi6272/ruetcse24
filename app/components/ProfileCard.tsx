@@ -24,7 +24,7 @@ export function ProfileCard({
     >
       {/* Blood Group */}
       <div
-        className={`absolute top-2.5 right-2.5 px-2 py-1  rounded-full bg-[#e0e7ff] z-9999999 text-xs`}
+        className={`absolute top-2.5 right-2.5 px-2 py-1  rounded-full bg-[#e0e7ff] z-9 text-xs`}
         data-name="BloodGroupContainer"
       >
         <i className="fas fa-droplet text-red-500"></i>
