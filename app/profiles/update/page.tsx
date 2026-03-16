@@ -4,22 +4,25 @@ import { useState } from "react";
 
 import toast from "react-hot-toast";
 
-import { getAllUsers, updateUser } from "../../../util/Database";
+import { getUserByEmail, updateUser } from "../../../util/Database";
 
 import type { Student } from "../../../types/Student";
+
 import { LoginPage } from "../../components/LoginPage";
-import { ProfilePage } from "../../components/ProfilePage";
+import { StudentPortalPage } from "../../components/StudentPortalPage";
+
 import { useStudentStore } from "../../../store/StudentStore";
 
 // Maximum file size (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-export default function StudentPortal() {
+export default function ProfileUpdatePage() {
   // Auth state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPincode, setLoginPincode] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
+
   // Profile state
   const [updateLoading, setUpdateLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
@@ -51,10 +54,7 @@ export default function StudentPortal() {
     setLoginLoading(true);
 
     try {
-      const data = await getAllUsers();
-      const user = data.find(
-        (s: Student) => s.email.toLowerCase() === loginEmail.toLowerCase(),
-      );
+      const user = await getUserByEmail(loginEmail);
       if (!user || user.pincode !== loginPincode) {
         toast.error("Invalid email or pincode");
         setLoginLoading(false);
@@ -114,6 +114,7 @@ export default function StudentPortal() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setUpdateLoading(true);
+
     if (!profileData) {
       toast.error("No profile data found.");
       setUpdateLoading(false);
@@ -220,7 +221,7 @@ export default function StudentPortal() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4 md:p-6 xl:p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 xl:p-8">
       {!isLoggedIn ? (
         <LoginPage
           handleLogin={handleLogin}
@@ -231,7 +232,7 @@ export default function StudentPortal() {
           loginLoading={loginLoading}
         />
       ) : (
-        <ProfilePage
+        <StudentPortalPage
           handleLogout={handleLogout}
           profileData={profileData}
           setProfileData={setProfileData}
@@ -244,78 +245,4 @@ export default function StudentPortal() {
       )}
     </div>
   );
-}
-
-{
-  /* Post Status Tab */
-}
-{
-  /* {activeProfileTab === "status" && (
-              <div className="space-y-4">
-                {currentStatus && (
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-800 mb-2">
-                      Your Current Status
-                    </h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-700">{currentStatus.text}</p>
-                      <p className="text-sm text-gray-500 mt-2">
-                        {formatTimestamp(currentStatus.timestamp)}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2 mt-2">
-                      <button
-                        onClick={handleEditStatus}
-                        className="text-sm bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={handleDeleteStatus}
-                        className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <form onSubmit={handlePostStatus} className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="statusText"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      What&apos;s on your mind?
-                    </label>
-                    <textarea
-                      id="statusText"
-                      rows={4}
-                      maxLength={50}
-                      value={statusText}
-                      onChange={(e) => setStatusText(e.target.value)}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                      placeholder="Share your thoughts (max 50 chars)..."
-                    />
-                    <div className="text-sm text-gray-500 mt-1">
-                      {statusText.length} / 50
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={statusLoading || !statusText.trim()}
-                      className="w-full bg-indigo-500 text-white py-2.5 rounded-lg flex items-center justify-center hover:bg-indigo-600 transition-colors disabled:opacity-50"
-                    >
-                      <span>
-                        {statusLoading ? "Posting..." : "Post Status"}
-                      </span>
-                      {statusLoading && (
-                        <div className="loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )} */
 }

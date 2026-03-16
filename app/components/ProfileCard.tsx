@@ -3,24 +3,24 @@ import Link from "next/link";
 import { nunito } from "../ui/fonts";
 
 import { CldImage } from "next-cloudinary";
+
 import { Student } from "../../types/Student";
 
 export function ProfileCard({
+  index,
   fullName,
   nickname,
-  profilePicUrl,
   bio,
-  sec,
   email,
+  mobileNumber,
   hobby,
   fbProfile,
   bloodGroup,
-  mobileNumber,
-  index,
-}: Student & { index: number }) {
+  profilePicUrl,
+}: { index: number } & Student) {
   return (
     <div
-      className={`profile-card relative rounded-xl shadow-sm overflow-hidden hover:shadow-md card-border animate-fade-fast delay-${index * 100}`}
+      className={`profile-card relative rounded-xl shadow-sm overflow-hidden hover:shadow-md card-border animate-fade-fast delay[${index * 100}ms]`}
     >
       {/* Blood Group */}
       <div
@@ -58,16 +58,16 @@ export function ProfileCard({
 
       <div className="p-4">
         {/* Name and Nickname */}
-        <div className="flex flex-col items-center text-center">
-          <h3
-            className={`text-xl text-gray-700 font-bold ${nunito.className}`}
-            data-name="name"
-          >
+        <div
+          className={`flex flex-col items-center text-center  ${nunito.className}`}
+          data-name="nameContainer"
+        >
+          <h3 className="text-xl text-gray-700 font-bold" data-name="name">
             {fullName}
           </h3>
           {nickname && (
             <span
-              className={`text-sm text-gray-600  ${nunito.className}`}
+              className="text-sm text-gray-600 font-medium"
               data-name="nickname"
             >
               {nickname}
@@ -75,16 +75,15 @@ export function ProfileCard({
           )}
         </div>
 
-        <div className="mt-4 space-y-3 text-gray-400">
+        {/* Bio, Email, Mobile Number, Hobby, Facebook Profile */}
+        <div className="mt-4 space-y-3 text-gray-400 pt-2 border-t border-gray-300">
           {/* Bio */}
           <div
-            className="pt-2 border-t border-gray-300 flex items-start gap-2"
+            className=" flex items-start gap-2 text-gray-500"
             data-name="bioContainer"
           >
-            <i style={{ fontSize: "15px", color: "gray" }} className="fa">
-              &#xf10d;
-            </i>
-            <p className={`text-md text-gray-500 bio-text`} data-name="bio">
+            <i className="fas fa-quote-left h-4 w-4"></i>
+            <p className="text-md bio-text" data-name="bio">
               {bio || "No bio available."}
             </p>
           </div>
@@ -116,7 +115,7 @@ export function ProfileCard({
           >
             <span className="flex items-center text-md">
               <i className="fas fa-fire h-4 w-4 mr-1 text-red-400"></i>
-              <span data-name="hobby">{hobby}</span>
+              <span data-name="hobby">{hobby || "No hobby specified"}</span>
             </span>
           </div>
 
@@ -129,10 +128,10 @@ export function ProfileCard({
               href={fbProfile || "#"}
               target="_blank"
               rel="noreferrer"
-              className="text-blue-600 hover:underline flex items-center"
+              className=" hover:underline flex items-center"
               data-name="fbProfile"
             >
-              <i className="fab fa-facebook h-4 w-4 mr-1"></i>
+              <i className="fab fa-facebook h-4 w-4 mr-1 text-blue-400"></i>
               &nbsp; Facebook Profile
             </Link>
           </div>

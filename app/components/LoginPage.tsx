@@ -18,7 +18,7 @@ export function LoginPage({
 }) {
   return (
     <div className="bg-white rounded-2xl shadow hover:shadow-lg p-6 w-full max-w-md">
-      <h1 className="text-2xl  text-gray-800 text-center mb-6">
+      <h1 className="text-2xl text-gray-800 text-center mb-6">
         Login to Your Account
       </h1>
       <form onSubmit={handleLogin} className="space-y-3">
@@ -68,7 +68,7 @@ export function LoginPage({
           <button
             type="submit"
             disabled={loginLoading}
-            className="w-full bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors"
+            className="w-full bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"
           >
             {loginLoading && <Spinner color="current" />}
             <span>{loginLoading ? "Logging in..." : "Login"}</span>

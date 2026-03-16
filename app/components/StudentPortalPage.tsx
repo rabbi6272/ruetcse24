@@ -4,7 +4,7 @@ import { ImageUploadModal } from "./ImageUploadModal";
 import type { Student } from "../../types/Student";
 import { Spinner } from "@heroui/react";
 
-export function ProfilePage({
+export function StudentPortalPage({
   handleLogout,
   profileData,
   setProfileData,
@@ -27,11 +27,11 @@ export function ProfilePage({
     <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
       <div className="flex items-center justify-between mb-4">
         {/* Header with Logout */}
-        <div>
-          <h1 className="text-2xl text-gray-800">Your Profile</h1>
+        <div className="space-y-2">
+          <h1 className="text-3xl text-gray-800">Your Profile</h1>
           <button
             onClick={handleLogout}
-            className="text-sm text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+            className="text-sm px-3.5 py-0.5 rounded-full text-red-500 border border-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300 cursor-pointer"
           >
             Logout
           </button>
@@ -144,7 +144,7 @@ export function ProfilePage({
             htmlFor="updateRoll"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Roll (Must)
+            Roll
           </label>
           <input
             type="text"
@@ -169,7 +169,7 @@ export function ProfilePage({
             htmlFor="updateBloodGroup"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Blood Group (Must)
+            Blood Group
           </label>
           <input
             type="text"
@@ -194,7 +194,7 @@ export function ProfilePage({
             htmlFor="updateMobileNumber"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Mobile Number (Must)
+            Mobile Number
           </label>
           <input
             type="text"
@@ -335,19 +335,20 @@ export function ProfilePage({
 
         <div className="pt-2 flex space-x-3">
           <button
+            type="button"
+            onClick={handleDeleteAccount}
+            className="cursor-pointer flex-1 border border-red-500 text-red-500 py-2.5 rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300"
+          >
+            Delete Account
+          </button>
+
+          <button
             type="submit"
             disabled={updateLoading}
-            className="flex-1 bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors"
+            className="cursor-pointer flex-1 bg-indigo-500 text-white py-2.5 rounded-full flex items-center justify-center  gap-2 hover:bg-indigo-600 transition-colors"
           >
             {updateLoading && <Spinner color="current" />}
             <span>{updateLoading ? "Updating..." : "Update Profile"}</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteAccount}
-            className="flex-1 bg-red-500 text-white py-2.5 rounded-full hover:bg-red-600 transition-colors"
-          >
-            Delete Account
           </button>
         </div>
       </form>
