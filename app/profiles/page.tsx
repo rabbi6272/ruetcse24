@@ -12,7 +12,6 @@ import { ProfilePageHeader } from "../components/ProfilePageHeader";
 import { ProfilePageSearchAndStats } from "../components/ProfilePageSearch&Stats";
 import { ProfilePageFooter } from "../components/ProfilePageFooter";
 import { ProfilePageProfileGrid } from "../components/ProfilePageProfileGrid";
-import { Navbar } from "../components/Navbar";
 
 export default function StudentManager() {
   const [filteredData, setFilteredData] = useState<Student[]>([]);
