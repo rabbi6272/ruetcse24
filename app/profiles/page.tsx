@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import { getAllUsers, migrateUsersToStudentSchema } from "../../util/Database";
+import { getAllUsers } from "../../util/Database";
 
 import type { Student } from "../../types/Student";
 
