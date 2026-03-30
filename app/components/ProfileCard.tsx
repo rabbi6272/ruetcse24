@@ -16,7 +16,7 @@ export function ProfileCard({
   hobby,
   fbProfile,
   bloodGroup,
-  profilePicUrl,
+  profilePicture,
 }: { index: number } & Student) {
   return (
     <div
@@ -34,13 +34,13 @@ export function ProfileCard({
       {/* Profile Image */}
       <div className="h-auto flex items-center justify-center px-3 pt-3">
         <div className="rounded-full ring-2 ring-indigo-500 relative">
-          {profilePicUrl ? (
+          {profilePicture?.url ? (
             <CldImage
               crop="fill"
               width={140}
               height={140}
               gravity="face"
-              src={profilePicUrl}
+              src={profilePicture?.url}
               alt="Profile Preview"
               className="rounded-full object-cover overflow-hidden"
             />

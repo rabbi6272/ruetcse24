@@ -10,8 +10,10 @@ export interface Student {
   fbProfile?: string;
   mobileNumber?: string;
   hobby?: string;
-  profilePicUrl?: string;
-  profilePicPublicId?: string;
+  profilePicture?: {
+    publicId: string;
+    url: string;
+  };
   sec?: string;
   createdAt: number;
   updatedAt?: number;

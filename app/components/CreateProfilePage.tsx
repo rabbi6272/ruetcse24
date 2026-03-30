@@ -30,13 +30,13 @@ export function CreateProfilePage({
 
         {/* Profile Picture Upload */}
         <div className="rounded-full h-30 w-30 ring-2 ring-indigo-500  relative">
-          {studentInfo?.profilePicUrl ? (
+          {studentInfo?.profilePicture?.url ? (
             <CldImage
               crop="fill"
               width={120}
               height={120}
               gravity="face"
-              src={studentInfo?.profilePicUrl}
+              src={studentInfo?.profilePicture?.url}
               alt="Profile Preview"
               className="rounded-full object-cover overflow-hidden"
             />

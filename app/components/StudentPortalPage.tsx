@@ -25,7 +25,7 @@ export function StudentPortalPage({
   handleDeleteAccount: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-3 lg:p-6 xl:p-8 w-full max-w-2xl">
+    <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 xl:p-8 w-full md:w-[80%] lg:max-w-2xl">
       <div className="flex items-center justify-between mb-4">
         {/* Header with Logout */}
         <div className="space-y-2">
@@ -40,13 +40,13 @@ export function StudentPortalPage({
 
         {/* Profile Picture Upload */}
         <div className="rounded-full h-30 w-30 ring-2 ring-indigo-500  relative">
-          {profileData?.profilePicUrl ? (
+          {profileData?.profilePicture?.url ? (
             <CldImage
               crop="fill"
               width={120}
               height={120}
               gravity="face"
-              src={profileData?.profilePicUrl}
+              src={profileData?.profilePicture?.url}
               alt="Profile Preview"
               className="rounded-full object-cover overflow-hidden"
             />

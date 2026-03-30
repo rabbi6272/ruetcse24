@@ -17,6 +17,7 @@ export function ImageUploadModal({
       >
         <SquarePen color="blue" size={20} />
       </Button>
+
       <ModalBackdrop variant={"blur"}>
         <Modal.Container>
           <Modal.Dialog>

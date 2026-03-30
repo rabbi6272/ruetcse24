@@ -19,10 +19,10 @@ export async function DELETE(request: Request) {
 
   try {
     // Remove file extension if present
-    const cleanPublicId = publicId.replace(/\.[^/.]+$/, "");
+    const cleanPublicId: string = publicId.replace(/\.[^/.]+$/, "");
 
     // If publicId doesn't include the folder, prepend it
-    const fullPublicId = cleanPublicId.startsWith("Users/")
+    const fullPublicId: string = cleanPublicId.startsWith("Users/")
       ? cleanPublicId
       : `Users/${cleanPublicId}`;
 

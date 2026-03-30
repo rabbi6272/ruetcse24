@@ -42,18 +42,18 @@ Place the files in your Next.js project:
 Make sure your `app/layout.tsx` imports the global CSS:
 
 ```tsx
-import './globals.css'
+import "./globals.css";
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body>{children}</body>
     </html>
-  )
+  );
 }
 ```
 
@@ -82,6 +82,7 @@ pnpm dev
 ### 5. Access the Application
 
 Open your browser and navigate to:
+
 ```
 http://localhost:3000/student-manager
 ```
@@ -89,26 +90,31 @@ http://localhost:3000/student-manager
 ## Usage
 
 ### Adding a Student
+
 1. Click the "+ Add Student" button
 2. Fill in the required fields (Full Name, Nickname, Email, Pincode)
 3. Optionally add Section, Hobby, Bio, Facebook Profile, and Profile Picture URL
 4. Click "Save Student"
 
 ### Editing a Student
+
 1. Click the "Edit" button on any student card
 2. Modify the information in the modal form
 3. Click "Save Student"
 
 ### Deleting a Student
+
 1. Click the "Delete" button on any student card
 2. Confirm the deletion in the popup
 
 ### Searching and Filtering
+
 - Use the search box to find students by name, email, nickname, or hobby
 - Use the section dropdown to filter by section (A, B, C, or No Section)
 - Both filters work together for more precise results
 
 ### Exporting Data
+
 When you add, edit, or delete a student, the system will automatically trigger a download of the updated `StudentInfo.json` file. Save this file to your `/public` folder to persist the changes.
 
 ## TypeScript Types
@@ -118,14 +124,20 @@ The application uses the following main types:
 ```typescript
 interface Student {
   bio?: string;
+  bloodGroup?: string;
   createdAt: number;
   email: string;
   fbProfile?: string;
   fullName: string;
   hobby?: string;
+  mobileNumber?: string;
   nickname: string;
   pincode: string;
-  profilePicUrl?: string;
+  profilePicture?: {
+    publicId: string;
+    url: string;
+  };
+  roll: string;
   sec?: string;
   updatedAt?: number;
 }
@@ -147,17 +159,20 @@ interface StudentsData {
 ## Customization
 
 ### Colors
+
 Edit the CSS variables in `globals.css`:
+
 ```css
 :root {
-    --bg-primary: #0a0e1a;
-    --accent-primary: #00ffc6;
-    --accent-secondary: #7c3aed;
-    /* ... */
+  --bg-primary: #0a0e1a;
+  --accent-primary: #00ffc6;
+  --accent-secondary: #7c3aed;
+  /* ... */
 }
 ```
 
 ### Fonts
+
 Change fonts in `globals.css` by updating the Google Fonts import.
 
 ## Browser Support

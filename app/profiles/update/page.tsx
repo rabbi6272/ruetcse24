@@ -44,8 +44,10 @@ export default function ProfileUpdatePage() {
     bio: "",
     pincode: "",
     sec: "",
-    profilePicUrl: "",
-    profilePicPublicId: "",
+    profilePicture: {
+      publicId: "",
+      url: "",
+    },
     createdAt: Date.now(),
   });
 
@@ -62,23 +64,7 @@ export default function ProfileUpdatePage() {
       }
 
       setIsLoggedIn(true);
-      setProfileData({
-        id: user.id,
-        fullName: user.fullName,
-        nickname: user.nickname,
-        email: user.email,
-        hobby: user.hobby || "",
-        fbProfile: user.fbProfile || "",
-        bio: user.bio || "",
-        pincode: user.pincode,
-        sec: user.sec || "",
-        profilePicUrl: user.profilePicUrl,
-        profilePicPublicId: user.profilePicPublicId || "",
-        createdAt: user.createdAt,
-        roll: user.roll,
-        bloodGroup: user.bloodGroup || "",
-        mobileNumber: user.mobileNumber || "",
-      });
+      setProfileData(user);
       toast.success("Login successful!");
     } catch (err) {
       toast.error("Login failed");
@@ -102,7 +88,10 @@ export default function ProfileUpdatePage() {
       bio: "",
       pincode: "",
       sec: "",
-      profilePicUrl: "",
+      profilePicture: {
+        publicId: "",
+        url: "",
+      },
       createdAt: Date.now(),
       roll: "",
       bloodGroup: "",
@@ -173,14 +162,17 @@ export default function ProfileUpdatePage() {
       toast.error("File size exceeds 5MB limit");
       return;
     }
+
     try {
       setImageUploadLoading(true);
 
       // Delete existing image
-      if (profileData?.profilePicPublicId) {
+      if (profileData?.profilePicture?.publicId) {
         const response = await fetch("/api/profiles/delete-image", {
           method: "DELETE",
-          body: JSON.stringify({ publicId: profileData.profilePicPublicId }),
+          body: JSON.stringify({
+            publicId: profileData.profilePicture.publicId,
+          }),
           headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
@@ -202,8 +194,10 @@ export default function ProfileUpdatePage() {
       }
       const updated = await updateUser(profileData.id, {
         ...profileData,
-        profilePicUrl: url,
-        profilePicPublicId: publicId,
+        profilePicture: {
+          url: url,
+          publicId: publicId,
+        },
       });
       if (updated) {
         setProfileData(updated);
@@ -221,7 +215,7 @@ export default function ProfileUpdatePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 xl:p-8">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-3 md:p-6 xl:p-8">
       {!isLoggedIn ? (
         <LoginPage
           handleLogin={handleLogin}

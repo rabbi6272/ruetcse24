@@ -21,8 +21,10 @@ export default function Page() {
     bio: "",
     pincode: "",
     sec: "",
-    profilePicUrl: "",
-    profilePicPublicId: "",
+    profilePicture: {
+      publicId: "",
+      url: "",
+    },
     createdAt: Date.now(),
     roll: "",
   });
@@ -85,8 +87,10 @@ export default function Page() {
         toast.error("Image upload failed");
         return;
       }
-      studentInfo.profilePicUrl = url;
-      studentInfo.profilePicPublicId = publicId;
+      studentInfo.profilePicture = {
+        url: url,
+        publicId: publicId,
+      };
       toast.success("Image uploaded successfully");
     } catch (error) {
       toast.error("Image upload failed");

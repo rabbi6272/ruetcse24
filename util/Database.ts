@@ -9,6 +9,7 @@ import {
   where,
   updateDoc,
   deleteDoc,
+  deleteField,
   DocumentData,
 } from "firebase/firestore";
 
@@ -86,8 +87,23 @@ function docToStudent(data: DocumentData): Student {
     sec: data.sec,
     bloodGroup: data.bloodGroup || "",
     mobileNumber: data.mobileNumber || "",
-    profilePicUrl: data.profilePicUrl,
-    profilePicPublicId: data.profilePicPublicId,
+    profilePicture:
+      data.profilePicture &&
+      typeof data.profilePicture === "object" &&
+      typeof data.profilePicture.publicId === "string" &&
+      typeof data.profilePicture.url === "string"
+        ? {
+            publicId: data.profilePicture.publicId,
+            url: data.profilePicture.url,
+          }
+        : {
+            publicId:
+              typeof data.profilePicPublicId === "string"
+                ? data.profilePicPublicId
+                : "",
+            url:
+              typeof data.profilePicUrl === "string" ? data.profilePicUrl : "",
+          },
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
   };

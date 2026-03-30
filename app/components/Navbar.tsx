@@ -5,7 +5,13 @@ export function Navbar() {
   return (
     <nav className="h-16 w-full sticky top-0 z-999 bg-white/40 text-gray-600 px-4 md:px-6 lg:px-8 xl:px-12 backdrop-blur-md shadow-sm flex items-center justify-between">
       <Link href={"/"}>
-        <Image src={"/icon.png"} alt="Home icon" width={70} height={30} />
+        <Image
+          src={"/icon.png"}
+          alt="Home icon"
+          width={70}
+          height={30}
+          style={{ height: "auto" }}
+        />
       </Link>
 
       <div className="sm:space-x-1 md:space-x-2 lg:space-x-3 xl:space-x-4">

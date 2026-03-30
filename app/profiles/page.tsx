@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import { getAllUsers } from "../../util/Database";
+import { getAllUsers, migrateUsersToStudentSchema } from "../../util/Database";
 
 import type { Student } from "../../types/Student";
 
@@ -62,7 +62,7 @@ export default function StudentManager() {
   };
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-[calc(100vh-64px)] p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <ProfilePageHeader />
