@@ -49,11 +49,11 @@ export default function EmailServices() {
       onSubmit={handleSubmit}
       className="flex flex-col items-center justify-center min-h-screen py-2 px-4"
     >
-      <h1 className="text-4xl font-bold mb-8">Email Services</h1>
+      <h1 className="text-4xl font-bold mb-2">Email Services</h1>
 
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+      <div className="w-full max-w-md bg-white p-5 rounded-lg shadow-lg">
         {/* Send Mode Selection */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block text-sm font-semibold mb-3">
             Select Send Mode:
           </label>
@@ -89,7 +89,7 @@ export default function EmailServices() {
 
         {/* Single Email Selection */}
         {sendMode === "single" && (
-          <div className="mb-6">
+          <div className="mb-4">
             <label
               htmlFor="emailSelect"
               className="block text-sm font-semibold mb-2"
@@ -114,7 +114,7 @@ export default function EmailServices() {
         )}
 
         {/* Email Subject */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label
             htmlFor="emailSubject"
             className="block text-sm font-semibold mb-2"
@@ -134,7 +134,7 @@ export default function EmailServices() {
         </div>
 
         {/* Email Content */}
-        <div className="mb-6">
+        <div className="mb-2">
           <label
             htmlFor="emailContent"
             className="block text-sm font-semibold mb-2"
@@ -151,45 +151,45 @@ export default function EmailServices() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
             placeholder="Enter HTML email content (or leave empty for default)"
           />
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500">
             Tip: You can use HTML tags. Leave empty to use default content.
           </p>
         </div>
 
         {/* Summary */}
-        <div className="mb-6 p-3 bg-blue-50 rounded-md border border-blue-200">
+        {/* <div className="mb-4 p-3 bg-blue-50 rounded-md border border-blue-200">
           <p className="text-sm text-gray-700">
             <strong>Recipients:</strong>{" "}
             {sendMode === "all"
               ? `All ${allEmails.length} emails`
               : allEmails[selectedIndex]}
           </p>
-        </div>
+        </div> */}
+
+        {/* Message Display */}
+        {message && (
+          <p
+            className={`text-sm text-center mb-2 px-3 py-2 rounded-full ${
+              message.startsWith("✓")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {message}
+          </p>
+        )}
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition duration-200"
+          className="w-full bg-blue-500 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-full transition duration-200"
         >
           {loading
             ? "Sending..."
             : `Send to ${sendMode === "all" ? "All" : "One"}`}
         </button>
       </div>
-
-      {/* Message Display */}
-      {message && (
-        <p
-          className={`text-lg mt-6 p-3 rounded-md ${
-            message.startsWith("✓")
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {message}
-        </p>
-      )}
     </form>
   );
 }

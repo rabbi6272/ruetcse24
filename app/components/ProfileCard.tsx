@@ -13,6 +13,7 @@ export function ProfileCard({
   bio,
   email,
   mobileNumber,
+  roll,
   hobby,
   fbProfile,
   bloodGroup,
@@ -24,11 +25,19 @@ export function ProfileCard({
     >
       {/* Blood Group */}
       <div
-        className={`absolute top-2.5 right-2.5 px-2 py-1  rounded-full bg-[#e0e7ff] z-9 text-xs`}
+        className={`absolute top-2 right-2 px-2 py-1 rounded-full bg-[#e0e7ff] z-9 text-[10px] `}
         data-name="BloodGroupContainer"
       >
         <i className="fas fa-droplet text-red-500"></i>
         <span data-name="BloodGroup">{bloodGroup}</span>
+      </div>
+
+      {/* Roll Number */}
+      <div
+        className={`absolute top-2 left-2 px-2 py-1 rounded-full bg-[#e0e7ff] z-9 text-[10px] `}
+        data-name="RollNumberContainer"
+      >
+        <span data-name="RollNumber">{roll || "2403..."}</span>
       </div>
 
       {/* Profile Image */}

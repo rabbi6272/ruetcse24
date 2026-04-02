@@ -5,6 +5,7 @@
   --animate-fade: fade 1s ease-in-out;
   --animate-fade-slow: fade 2s ease-in-out;
   --animate-fade-fast: fade 0.5s ease-in-out;
+  --animate-image-fade-in: fadeIn 0.5s ease-in-out;
 }
 @keyframes fade {
   from {
@@ -13,6 +14,23 @@
   to {
     opacity: 1;
   }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
 }
 
 body,

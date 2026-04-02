@@ -209,37 +209,69 @@ export default function Page(): React.ReactElement {
     const shuffledNames = shuffleArray(names);
 
     // Title animation
-    const animateTitle = async () => {
+    const animateTitle = () => {
       const title = titleRef.current;
-      if (!title) return;
+      if (!title) return () => {};
 
-      const letters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#@&?!-_.;:'*%^~=><;π√{}[]ηθοβωψςδαημεργφνζ";
+      const drumChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
       const targetText = title.dataset.value || "CSE-24";
+      const drumLength = drumChars.length;
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const wheels = targetText.split("").map((char, index) => ({
+        target: char,
+        startOffset: Math.floor(Math.random() * drumLength),
+        // Later letters spin slightly longer for a drum-roll reveal.
+        spins: 9 + index * 2 + Math.floor(Math.random() * 3),
+      }));
 
-      let iteration = 0;
-      const interval = setInterval(() => {
-        title.textContent = targetText
-          .split("")
-          .map((letter, index) => {
-            if (index < iteration) {
-              return targetText[index];
+      let frame = 0;
+
+      const tick = () => {
+        const nextFrameText = wheels
+          .map((wheel, index) => {
+            if (wheel.target === " ") return " ";
+
+            // Each character starts a little later to mimic rolling drums.
+            const localFrame = frame - index * 3;
+            if (localFrame < 0) {
+              return drumChars[wheel.startOffset % drumLength];
             }
-            return letters[Math.floor(Math.random() * letters.length)];
+            if (localFrame >= wheel.spins) {
+              return wheel.target;
+            }
+
+            const drumIndex = (wheel.startOffset + localFrame) % drumLength;
+            return drumChars[drumIndex];
           })
           .join("");
 
-        if (iteration >= targetText.length) {
-          clearInterval(interval);
+        title.textContent = nextFrameText;
+
+        const finished = wheels.every((wheel, index) => {
+          if (wheel.target === " ") return true;
+          return frame - index * 3 >= wheel.spins;
+        });
+
+        if (finished) {
+          title.textContent = targetText;
+          return;
         }
 
-        iteration += 1 / 3;
-      }, 100);
+        frame += 1;
+        timeoutId = setTimeout(tick, 50);
+      };
+
+      timeoutId = setTimeout(tick, 220);
+
+      return () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+        }
+      };
     };
 
-    animateTitle();
+    const stopTitleAnimation = animateTitle();
 
     // Place names
     const container = namesContainerRef.current;
@@ -340,6 +372,7 @@ export default function Page(): React.ReactElement {
     document.addEventListener("selectstart", handleSelectStart);
 
     return () => {
+      stopTitleAnimation();
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("contextmenu", handleContextMenu);
       document.removeEventListener("selectstart", handleSelectStart);
@@ -392,9 +425,9 @@ export default function Page(): React.ReactElement {
       {/* Profiles Button */}
       <Link
         href="/profiles"
-        className="profiles-button fixed top-5 right-5 w-15 h-15 flex items-center justify-center bg-blue-600 text-white rounded-full no-underline text-2xl shadow-lg hover:bg-blue-700 transition-colors z-99999"
+        className="profiles-button fixed top-5 right-5 w-13 h-13 flex items-center justify-center bg-blue-600 text-white rounded-full no-underline text-2xl shadow-lg hover:bg-blue-700 transition-colors z-99999"
       >
-        <Users size={24} />
+        <Users size={20} />
       </Link>
 
       {/* Main Container */}
@@ -404,10 +437,11 @@ export default function Page(): React.ReactElement {
           alt="RUET Logo"
           width={200}
           height={200}
-          className="mx-auto"
+          loading="eager"
+          className="mx-auto h-auto w-auto animate-image-fade-in"
         />
 
-        <h3 className="text-lg font-medium mt-1">
+        <h3 className="text-lg font-medium mt-1 animate-image-fade-in">
           Rajshahi University of Engineering and Technology (24-25)
         </h3>
 

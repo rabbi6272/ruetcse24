@@ -10,6 +10,7 @@ export function Navbar() {
           alt="Home icon"
           width={70}
           height={30}
+          loading="lazy"
           style={{ height: "auto" }}
         />
       </Link>
