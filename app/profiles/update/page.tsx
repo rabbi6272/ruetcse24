@@ -15,6 +15,12 @@ import { useStudentStore } from "../../../store/StudentStore";
 
 // Maximum file size (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 
 export default function ProfileUpdatePage() {
   // Auth state
@@ -151,12 +157,20 @@ export default function ProfileUpdatePage() {
   // Handle image upload
   const handleImageUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (imageUploadLoading) return;
+
     const formData = new FormData(e.currentTarget);
     const file: File | null = formData.get("profile") as File | null;
-    if (!file) {
+    if (!file || file.size === 0) {
       toast.error("No file selected");
       return;
     }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("Only JPEG, PNG, and WebP images are allowed");
+      return;
+    }
+
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       toast.error("File size exceeds 5MB limit");
@@ -166,32 +180,20 @@ export default function ProfileUpdatePage() {
     try {
       setImageUploadLoading(true);
 
-      // Delete existing image
-      if (profileData?.profilePicture?.publicId) {
-        const response = await fetch("/api/profiles/delete-image", {
-          method: "DELETE",
-          body: JSON.stringify({
-            publicId: profileData.profilePicture.publicId,
-          }),
-          headers: { "Content-Type": "application/json" },
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          toast.error(data.error || "Failed to delete existing image");
-          return;
-        }
-      }
+      const previousPublicId = profileData?.profilePicture?.publicId;
 
       // Upload new image
       const response = await fetch("/api/profiles/upload-image", {
         method: "POST",
         body: formData,
       });
-      const { success, url, publicId } = await response.json();
-      if (!success) {
-        toast.error("Image upload failed");
+      const uploadData = await response.json();
+      const { success, url, publicId } = uploadData;
+      if (!response.ok || !success || !url || !publicId) {
+        toast.error(uploadData.error || "Image upload failed");
         return;
       }
+
       const updated = await updateUser(profileData.id, {
         ...profileData,
         profilePicture: {
@@ -199,19 +201,45 @@ export default function ProfileUpdatePage() {
           publicId: publicId,
         },
       });
-      if (updated) {
-        setProfileData(updated);
-        // Update the store to reflect changes in the profiles page
-        updateStudentInStore(updated.id, updated);
-        toast.success("Image uploaded successfully");
-      } else {
+
+      if (!updated) {
+        await deleteProfileImage(publicId);
         toast.error("Failed to update profile with image");
+        return;
       }
+
+      setProfileData(updated);
+      // Update the store to reflect changes in the profiles page
+      updateStudentInStore(updated.id, updated);
+
+      if (previousPublicId && previousPublicId !== publicId) {
+        const deletedPreviousImage = await deleteProfileImage(previousPublicId);
+        if (!deletedPreviousImage) {
+          toast.error("Image updated, but the old image cleanup failed");
+          return;
+        }
+      }
+
+      toast.success("Image uploaded successfully");
     } catch (error) {
       toast.error("Image upload failed");
     } finally {
       setImageUploadLoading(false);
     }
+  };
+
+  const deleteProfileImage = async (publicId: string) => {
+    const response = await fetch("/api/profiles/delete-image", {
+      method: "DELETE",
+      body: JSON.stringify({
+        publicId,
+        studentId: profileData.id,
+        pincode: profileData.pincode,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    return response.ok;
   };
 
   return (

@@ -36,6 +36,7 @@ export function ImageUploadModal({
                   name="profile"
                   accept="image/*"
                   className="w-full"
+                  disabled={imageUploadLoading}
                 />
               </form>
               <p className="text-xs text-gray-500 mt-2">Max file size: 5MB</p>
@@ -47,6 +48,7 @@ export function ImageUploadModal({
                 }
                 form="uploadForm"
                 type="submit"
+                isDisabled={imageUploadLoading}
               >
                 {imageUploadLoading ? "Uploading..." : "Upload"}
                 {imageUploadLoading && (

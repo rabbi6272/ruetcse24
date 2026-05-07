@@ -1,35 +1,38 @@
-import { CldImage } from "next-cloudinary";
-import { ImageUploadModal } from "./ImageUploadModal";
+// import { CldImage } from "next-cloudinary";
+// import { ImageUploadModal } from "./ImageUploadModal";
 
 import type { Student } from "../../types/Student";
-import { User2 } from "lucide-react";
+
 import { Spinner } from "@heroui/react";
+// import { User2 } from "lucide-react";
 
 export function CreateProfilePage({
   studentInfo,
   setStudentInfo,
   handleCreateProfile,
   createLoading,
-  handleImageUpload,
-  imageUploadLoading,
+  // handleImageUpload,
+  // imageUploadLoading,
 }: {
   studentInfo: Student;
   setStudentInfo: React.Dispatch<React.SetStateAction<Student>>;
   handleCreateProfile: (e: React.FormEvent<HTMLFormElement>) => void;
   createLoading: boolean;
-  handleImageUpload: (e: React.FormEvent<HTMLFormElement>) => void;
-  imageUploadLoading: boolean;
+  // handleImageUpload: (e: React.FormEvent<HTMLFormElement>) => void;
+  // imageUploadLoading: boolean;
 }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
-      <div className="flex items-center justify-between mb-4">
-        {/* Header with Logout */}
+      <div className=" mb-4">
+        {/* Header  */}
         <div>
-          <h1 className="text-2xl text-gray-800">Create Your Profile</h1>
+          <h1 className="text-2xl font-semibold text-center text-gray-800">
+            Create Your Profile
+          </h1>
         </div>
 
         {/* Profile Picture Upload */}
-        <div className="rounded-full h-30 w-30 ring-2 ring-indigo-500  relative">
+        {/* <div className="rounded-full h-30 w-30 ring-2 ring-indigo-500  relative">
           {studentInfo?.profilePicture?.url ? (
             <CldImage
               crop="fill"
@@ -49,7 +52,7 @@ export function CreateProfilePage({
             handleImageUpload={handleImageUpload}
             imageUploadLoading={imageUploadLoading}
           />
-        </div>
+        </div> */}
       </div>
 
       <form onSubmit={handleCreateProfile} className="space-y-3 text-gray-600">

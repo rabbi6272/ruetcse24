@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+
 import { CreateProfilePage } from "../../components/CreateProfilePage";
-import toast from "react-hot-toast";
 import { createUser } from "../../../util/Database";
 import { Student } from "../../../types/Student";
-import { useRouter } from "next/navigation";
+
+import toast from "react-hot-toast";
 
 // Maximum file size (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -29,7 +31,7 @@ export default function Page() {
     roll: "",
   });
   const [createLoading, setCreateLoading] = useState(false);
-  const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  // const [imageUploadLoading, setImageUploadLoading] = useState(false);
 
   const router = useRouter();
 
@@ -62,42 +64,42 @@ export default function Page() {
     }
   };
 
-  const handleImageUpload = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const file: File = formData.get("profile") as File;
-    if (file.size === 0) {
-      toast.error("No file selected");
-      return;
-    }
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File size exceeds 5MB limit");
-      return;
-    }
-    try {
-      setImageUploadLoading(true);
-      // Upload new image
-      const response = await fetch("/api/profiles/upload-image", {
-        method: "POST",
-        body: formData,
-      });
-      const { success, url, publicId } = await response.json();
-      if (!success) {
-        toast.error("Image upload failed");
-        return;
-      }
-      studentInfo.profilePicture = {
-        url: url,
-        publicId: publicId,
-      };
-      toast.success("Image uploaded successfully");
-    } catch (error) {
-      toast.error("Image upload failed");
-    } finally {
-      setImageUploadLoading(false);
-    }
-  };
+  // const handleImageUpload = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const formData = new FormData(e.currentTarget);
+  //   const file: File = formData.get("profile") as File;
+  //   if (file.size === 0) {
+  //     toast.error("No file selected");
+  //     return;
+  //   }
+  //   // Validate file size
+  //   if (file.size > MAX_FILE_SIZE) {
+  //     toast.error("File size exceeds 5MB limit");
+  //     return;
+  //   }
+  //   try {
+  //     setImageUploadLoading(true);
+  //     // Upload new image
+  //     const response = await fetch("/api/profiles/upload-image", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  //     const { success, url, publicId } = await response.json();
+  //     if (!success) {
+  //       toast.error("Image upload failed");
+  //       return;
+  //     }
+  //     studentInfo.profilePicture = {
+  //       url: url,
+  //       publicId: publicId,
+  //     };
+  //     toast.success("Image uploaded successfully");
+  //   } catch (error) {
+  //     toast.error("Image upload failed");
+  //   } finally {
+  //     setImageUploadLoading(false);
+  //   }
+  // };
 
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4 md:p-6 xl:p-8">
@@ -106,8 +108,8 @@ export default function Page() {
         setStudentInfo={setStudentInfo}
         handleCreateProfile={handleCreateProfile}
         createLoading={createLoading}
-        handleImageUpload={handleImageUpload}
-        imageUploadLoading={imageUploadLoading}
+        // handleImageUpload={handleImageUpload}
+        // imageUploadLoading={imageUploadLoading}
       />
     </main>
   );

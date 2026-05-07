@@ -1,23 +1,31 @@
 import { v2 as cloudinary } from "cloudinary";
+import { doc, getDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
+
+import { db } from "../../../../util/FirebaseConfig";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-  api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 export async function DELETE(request: Request) {
-  const { publicId } = await request.json();
-
-  if (!publicId) {
-    return NextResponse.json(
-      { error: "PublicId is required" },
-      { status: 400 },
-    );
-  }
-
   try {
+    const { publicId, studentId, pincode } = await request.json();
+
+    if (!publicId || !studentId || !pincode) {
+      return NextResponse.json(
+        { error: "PublicId, studentId, and pincode are required" },
+        { status: 400 },
+      );
+    }
+
+    const studentSnap = await getDoc(doc(db, "users", studentId));
+    if (!studentSnap.exists() || studentSnap.data().pincode !== pincode) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // Remove file extension if present
     const cleanPublicId: string = publicId.replace(/\.[^/.]+$/, "");
 
@@ -25,6 +33,13 @@ export async function DELETE(request: Request) {
     const fullPublicId: string = cleanPublicId.startsWith("Users/")
       ? cleanPublicId
       : `Users/${cleanPublicId}`;
+
+    if (!fullPublicId.startsWith("Users/")) {
+      return NextResponse.json(
+        { error: "Invalid image publicId" },
+        { status: 400 },
+      );
+    }
 
     const result = await cloudinary.uploader.destroy(fullPublicId, {
       resource_type: "image",

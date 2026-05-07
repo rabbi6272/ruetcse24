@@ -1,6 +1,5 @@
-import { initializeApp } from "firebase/app";
+import { getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,10 +11,18 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6LcO7aYsAAAAAP-IPs5gALP0XxwlG-KqgLUsgb_k"),
-});
+if (typeof window !== "undefined") {
+  import("firebase/app-check").then(
+    ({ initializeAppCheck, ReCaptchaV3Provider }) => {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(
+          "6LcO7aYsAAAAAP-IPs5gALP0XxwlG-KqgLUsgb_k",
+        ),
+      });
+    },
+  );
+}
 
 export const db = getFirestore(app);
