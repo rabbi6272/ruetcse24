@@ -14,6 +14,7 @@ export function StudentPortalPage({
   handleImageUpload,
   imageUploadLoading,
   handleDeleteAccount,
+  deleteLoading,
 }: {
   handleLogout: () => void;
   profileData: Student;
@@ -23,6 +24,7 @@ export function StudentPortalPage({
   handleImageUpload: (e: React.FormEvent<HTMLFormElement>) => void;
   imageUploadLoading: boolean;
   handleDeleteAccount: () => void;
+  deleteLoading: boolean;
 }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 xl:p-8 w-full md:w-[80%] lg:max-w-2xl">
@@ -338,9 +340,11 @@ export function StudentPortalPage({
           <button
             type="button"
             onClick={handleDeleteAccount}
-            className="cursor-pointer flex-1 border border-red-500 text-red-500 py-2.5 rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300"
+            disabled={deleteLoading}
+            className="cursor-pointer flex-1 border border-red-500 text-red-500 py-2.5 rounded-full flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Delete Account
+            {deleteLoading && <Spinner color="current" />}
+            <span>{deleteLoading ? "Deleting..." : "Delete Account"}</span>
           </button>
 
           <button

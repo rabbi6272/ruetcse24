@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import toast from "react-hot-toast";
 
-import { getUserByEmail, updateUser } from "../../../util/Database";
+import { deleteUser, getUserByEmail, updateUser } from "../../../util/Database";
 
 import type { Student } from "../../../types/Student";
 
@@ -31,10 +31,14 @@ export default function ProfileUpdatePage() {
 
   // Profile state
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
 
   // Zustand store
   const updateStudentInStore = useStudentStore((state) => state.updateStudent);
+  const deleteStudentFromStore = useStudentStore(
+    (state) => state.deleteStudent,
+  );
 
   // Profile form data
   const [profileData, setProfileData] = useState<Student>({
@@ -143,21 +147,40 @@ export default function ProfileUpdatePage() {
 
   // Handle account deletion
   const handleDeleteAccount = async () => {
-    if (!profileData) return;
+    if (!profileData || deleteLoading) return;
+
+    if (!profileData.id) {
+      toast.error("Profile is missing an ID. Please login again.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account? This cannot be undone.",
+    );
+
+    if (!confirmed) return;
+
+    setDeleteLoading(true);
+
     try {
-      const res = await fetch(`/api/students`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileData),
-      });
-      if (!res.ok) {
+      if (profileData.profilePicture?.publicId) {
+        await deleteProfileImage(profileData.profilePicture.publicId);
+      }
+
+      const deleted = await deleteUser(profileData.id);
+      if (!deleted) {
         toast.error("Failed to delete account");
         return;
       }
+
+      deleteStudentFromStore(profileData.id);
       toast.success("Account deleted");
       handleLogout();
     } catch (err) {
+      console.error("Account deletion failed:", err);
       toast.error("Failed to delete account");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -271,6 +294,7 @@ export default function ProfileUpdatePage() {
           handleImageUpload={handleImageUpload}
           imageUploadLoading={imageUploadLoading}
           handleDeleteAccount={handleDeleteAccount}
+          deleteLoading={deleteLoading}
         />
       )}
     </div>
