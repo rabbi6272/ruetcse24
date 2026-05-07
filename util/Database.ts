@@ -9,7 +9,6 @@ import {
   where,
   updateDoc,
   deleteDoc,
-  deleteField,
   DocumentData,
 } from "firebase/firestore";
 
@@ -29,7 +28,7 @@ export async function createUser(
 
   const snap = await getDoc(ref);
   if (!snap.exists()) throw new Error("Failed to create user");
-  return docToStudent(snap.data() as DocumentData);
+  return docToStudent(snap.data() as DocumentData, snap.id);
 }
 
 export async function getAllUsers(): Promise<Student[]> {
@@ -37,7 +36,7 @@ export async function getAllUsers(): Promise<Student[]> {
   if (snaps.empty) throw new Error("Document does not exist");
   const users: Student[] = [];
   snaps.forEach((docSnap) => {
-    users.push(docToStudent(docSnap.data() as DocumentData));
+    users.push(docToStudent(docSnap.data() as DocumentData, docSnap.id));
   });
   return users;
 }
@@ -48,21 +47,23 @@ export async function getUserByEmail(email: string): Promise<Student | null> {
   const snaps = await getDocs(q);
   if (snaps.empty) return null;
   const first = snaps.docs[0];
-  return docToStudent(first.data() as DocumentData);
+  return docToStudent(first.data() as DocumentData, first.id);
 }
 
 export async function updateUser(
   id: string,
   updates: Partial<Omit<Student, "id" | "createdAt">>,
 ): Promise<Student | null> {
+  if (!id) return null;
+
   const ref = doc(db, USERS_COLLECTION, id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  const payload = { ...updates, updatedAt: Date.now() } as any;
+  const payload = toUpdatePayload(updates);
   await updateDoc(ref, payload);
   const updatedSnap = await getDoc(ref);
   if (!updatedSnap.exists()) return null;
-  return docToStudent(updatedSnap.data() as DocumentData);
+  return docToStudent(updatedSnap.data() as DocumentData, updatedSnap.id);
 }
 
 export async function deleteUser(id: string): Promise<boolean> {
@@ -73,20 +74,20 @@ export async function deleteUser(id: string): Promise<boolean> {
   return true;
 }
 
-function docToStudent(data: DocumentData): Student {
+function docToStudent(data: DocumentData, docId = ""): Student {
   return {
-    id: data.id,
-    fullName: data.fullName,
-    nickname: data.nickname,
-    email: data.email,
-    pincode: data.pincode,
-    roll: data.roll,
-    bio: data.bio,
-    hobby: data.hobby,
-    fbProfile: data.fbProfile,
-    sec: data.sec,
-    bloodGroup: data.bloodGroup || "",
-    mobileNumber: data.mobileNumber || "",
+    id: stringOrEmpty(data.id) || docId,
+    fullName: stringOrEmpty(data.fullName),
+    nickname: stringOrEmpty(data.nickname),
+    email: stringOrEmpty(data.email),
+    pincode: stringOrEmpty(data.pincode),
+    roll: stringOrEmpty(data.roll),
+    bio: stringOrEmpty(data.bio),
+    hobby: stringOrEmpty(data.hobby),
+    fbProfile: stringOrEmpty(data.fbProfile),
+    sec: stringOrEmpty(data.sec),
+    bloodGroup: stringOrEmpty(data.bloodGroup),
+    mobileNumber: stringOrEmpty(data.mobileNumber),
     profilePicture:
       data.profilePicture &&
       typeof data.profilePicture === "object" &&
@@ -104,7 +105,52 @@ function docToStudent(data: DocumentData): Student {
             url:
               typeof data.profilePicUrl === "string" ? data.profilePicUrl : "",
           },
-    createdAt: data.createdAt,
+    createdAt: typeof data.createdAt === "number" ? data.createdAt : Date.now(),
     updatedAt: data.updatedAt,
   };
+}
+
+function toUpdatePayload(updates: Partial<Omit<Student, "id" | "createdAt">>) {
+  const payload: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  addStringField(payload, updates, "fullName");
+  addStringField(payload, updates, "nickname");
+  addStringField(payload, updates, "email");
+  addStringField(payload, updates, "pincode");
+  addStringField(payload, updates, "roll");
+  addStringField(payload, updates, "bio");
+  addStringField(payload, updates, "hobby");
+  addStringField(payload, updates, "fbProfile");
+  addStringField(payload, updates, "sec");
+  addStringField(payload, updates, "bloodGroup");
+  addStringField(payload, updates, "mobileNumber");
+
+  if (hasOwn(updates, "profilePicture")) {
+    payload.profilePicture = {
+      publicId: stringOrEmpty(updates.profilePicture?.publicId),
+      url: stringOrEmpty(updates.profilePicture?.url),
+    };
+  }
+
+  return payload;
+}
+
+function addStringField(
+  payload: Record<string, unknown>,
+  updates: Partial<Omit<Student, "id" | "createdAt">>,
+  key: keyof Omit<Student, "id" | "createdAt" | "profilePicture" | "updatedAt">,
+) {
+  if (hasOwn(updates, key)) {
+    payload[key] = stringOrEmpty(updates[key]);
+  }
+}
+
+function hasOwn<T extends object>(value: T, key: PropertyKey): boolean {
+  return Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function stringOrEmpty(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }

@@ -116,6 +116,12 @@ export default function ProfileUpdatePage() {
       return;
     }
 
+    if (!profileData.id) {
+      toast.error("Profile is missing an ID. Please login again.");
+      setUpdateLoading(false);
+      return;
+    }
+
     try {
       const updated = await updateUser(profileData.id, profileData);
       if (!updated) {
@@ -128,13 +134,14 @@ export default function ProfileUpdatePage() {
       updateStudentInStore(updated.id, updated);
       toast.success("Profile updated successfully!");
     } catch (err) {
+      console.error("Profile update failed:", err);
       toast.error("Update failed");
     } finally {
       setUpdateLoading(false);
     }
   };
 
-  // Handle account deletion (use server API)
+  // Handle account deletion
   const handleDeleteAccount = async () => {
     if (!profileData) return;
     try {
@@ -161,6 +168,7 @@ export default function ProfileUpdatePage() {
 
     const formData = new FormData(e.currentTarget);
     const file: File | null = formData.get("profile") as File | null;
+
     if (!file || file.size === 0) {
       toast.error("No file selected");
       return;
