@@ -1,187 +1,96 @@
-# Student Manager - Next.js TypeScript Application
+# RUET CSE 24
 
-A modern student management system built with Next.js, TypeScript, and CSS Modules featuring a dark cyberpunk UI design.
+RUET CSE 24 is a community web app for the Computer Science and Engineering 2024 batch of Rajshahi University of Engineering and Technology. It presents the batch identity, lets visitors browse student profiles, and gives students a simple way to create and update their own information.
 
-## Features
+## About the Project
 
-- ✅ **Read & Display** - Beautiful card-based grid layout
-- 🔍 **Search & Filter** - Real-time search and section filtering
-- ➕ **Add Students** - Clean modal form for adding new students
-- ✏️ **Edit Students** - Edit existing student information
-- 🗑️ **Delete Students** - Remove students with confirmation
-- 📊 **Statistics** - Live stats dashboard
-- 💾 **Export Data** - Download updated JSON file
+This project was built to keep the RUET CSE 24 batch connected in one shared digital space. The homepage introduces the batch with a visual showcase, while the profiles section works as a student directory where classmates can find each other by name, roll, email, hobby, or contact information.
 
-## Project Structure
+The app is designed for:
 
-```
-your-nextjs-app/
-├── app/
-│   ├── globals.css                    # Global styles with dark theme
-│   ├── layout.tsx                     # Root layout
-│   └── student-manager/
-│       ├── page.tsx                   # Main component
-│       └── StudentManager.module.css  # Component styles
-└── public/
-    └── StudentInfo.json               # Student data
-```
+- Showcasing the RUET CSE 24 batch.
+- Browsing student profiles in a clean directory.
+- Helping students keep their personal information updated.
+- Sharing basic contact and social information among classmates.
+- Sending batch-related email updates when needed.
 
-## Setup Instructions
+## Main Features
 
-### 1. File Placement
+- Animated RUET CSE 24 landing page.
+- Public student profile directory.
+- Searchable profiles.
+- Student profile creation.
+- Student profile update using email and pincode.
+- Profile picture upload.
+- Account deletion option.
+- Forgot-pincode flow.
+- Batch email utility.
+- Responsive design for mobile and desktop.
 
-Place the files in your Next.js project:
+## Student Profile Information
 
-- `page.tsx` → `/app/student-manager/page.tsx`
-- `StudentManager.module.css` → `/app/student-manager/StudentManager.module.css`
-- `globals.css` → `/app/globals.css`
-- `StudentInfo.json` → `/public/StudentInfo.json`
+Each profile can include:
 
-### 2. Update Root Layout (if needed)
+- Full name
+- Nickname
+- Roll number
+- Section
+- Email address
+- Mobile number
+- Blood group
+- Hobby
+- Short bio
+- Facebook profile
+- Profile picture
 
-Make sure your `app/layout.tsx` imports the global CSS:
+## Pages
 
-```tsx
-import "./globals.css";
+- `/` - Main landing page.
+- `/profiles` - Student profile directory.
+- `/profiles/create` - Create a new profile.
+- `/profiles/update` - Login and update an existing profile.
+- `/profiles/forgot-pincode` - Reset profile pincode.
+- `/email-services` - Send batch email updates.
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
-```
+## Getting Started
 
-### 3. Install Dependencies
-
-Make sure you have the required dependencies:
+Install dependencies:
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-### 4. Run the Development Server
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-### 5. Access the Application
+Open the app:
 
-Open your browser and navigate to:
-
-```
-http://localhost:3000/student-manager
+```text
+http://localhost:3000
 ```
 
-## Usage
+## Available Scripts
 
-### Adding a Student
-
-1. Click the "+ Add Student" button
-2. Fill in the required fields (Full Name, Nickname, Email, Pincode)
-3. Optionally add Section, Hobby, Bio, Facebook Profile, and Profile Picture URL
-4. Click "Save Student"
-
-### Editing a Student
-
-1. Click the "Edit" button on any student card
-2. Modify the information in the modal form
-3. Click "Save Student"
-
-### Deleting a Student
-
-1. Click the "Delete" button on any student card
-2. Confirm the deletion in the popup
-
-### Searching and Filtering
-
-- Use the search box to find students by name, email, nickname, or hobby
-- Use the section dropdown to filter by section (A, B, C, or No Section)
-- Both filters work together for more precise results
-
-### Exporting Data
-
-When you add, edit, or delete a student, the system will automatically trigger a download of the updated `StudentInfo.json` file. Save this file to your `/public` folder to persist the changes.
-
-## TypeScript Types
-
-The application uses the following main types:
-
-```typescript
-interface Student {
-  bio?: string;
-  bloodGroup?: string;
-  createdAt: number;
-  email: string;
-  fbProfile?: string;
-  fullName: string;
-  hobby?: string;
-  mobileNumber?: string;
-  nickname: string;
-  pincode: string;
-  profilePicture?: {
-    publicId: string;
-    url: string;
-  };
-  roll: string;
-  sec?: string;
-  updatedAt?: number;
-}
-
-interface StudentsData {
-  [key: string]: Student;
-}
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
 ```
 
-## Design Features
+## Required Configuration
 
-- **Dark Cyberpunk Theme** - Modern dark UI with neon accents
-- **Gradient Effects** - Beautiful gradient text and buttons
-- **Smooth Animations** - Fade-in, slide, and hover effects
-- **Responsive Design** - Works on mobile, tablet, and desktop
-- **Custom Typography** - Darker Grotesque & JetBrains Mono fonts
-- **Glowing Effects** - Neon glow on hover and focus states
+The project needs environment variables for:
 
-## Customization
+- Firebase
+- Cloudinary
+- Resend
 
-### Colors
+Create a `.env.local` file in the project root and add the required values before running the full app locally.
 
-Edit the CSS variables in `globals.css`:
+## Project Purpose
 
-```css
-:root {
-  --bg-primary: #0a0e1a;
-  --accent-primary: #00ffc6;
-  --accent-secondary: #7c3aed;
-  /* ... */
-}
-```
-
-### Fonts
-
-Change fonts in `globals.css` by updating the Google Fonts import.
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## License
-
-MIT
+The goal of this project is simple: to create a useful, organized, and memorable online space for RUET CSE 24 students. It is both a batch showcase and a practical profile directory for classmates.
