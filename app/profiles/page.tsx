@@ -1,70 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { getAllUsers } from "../../util/Database";
+import { queryKeys } from "../../util/queryKeys";
 
 import type { Student } from "../../types/Student";
-
-import { useStudentStore } from "../../store/StudentStore";
 
 import { ProfilePageHeader } from "../components/ProfilePageHeader";
 import { ProfilePageSearchAndStats } from "../components/ProfilePageSearch&Stats";
 import { ProfilePageFooter } from "../components/ProfilePageFooter";
 import { ProfilePageProfileGrid } from "../components/ProfilePageProfileGrid";
 
+async function fetchStudents() {
+  const students = await getAllUsers();
+
+  return students.sort((a, b) => a.roll.localeCompare(b.roll));
+}
+
 export default function StudentManager() {
-  const [filteredData, setFilteredData] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [studentsLoading, setStudentsLoading] = useState(false);
+  const {
+    data: allStudents = [],
+    isLoading: studentsLoading,
+    isError,
+  } = useQuery({
+    queryKey: queryKeys.students,
+    queryFn: fetchStudents,
+  });
 
-  const allStudents = useStudentStore((state) => state.allStudents);
-  const setAllStudents = useStudentStore((state) => state.setAllStudents);
+  const filteredData = useMemo(() => {
+    const normalizedSearchTerm = searchTerm.toLowerCase();
 
-  async function fetchUsers() {
-    try {
-      setStudentsLoading(true);
-      const res = await getAllUsers();
-      res.sort((a, b) => {
-        const rollA = a.roll;
-        const rollB = b.roll;
-        return rollA.localeCompare(rollB);
-      });
-      setAllStudents(res);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    } finally {
-      setStudentsLoading(false);
-    }
-  }
-
-  // Fetch users on component mount
-  useEffect(() => {
-    if (allStudents.length > 0) return;
-    fetchUsers();
-  }, []);
-
-  // Filter students when search or filter changes
-  useEffect(() => {
-    filterStudents();
-  }, [searchTerm, allStudents]);
-
-  const filterStudents = () => {
-    const filtered = allStudents.filter((student) => {
+    return allStudents.filter((student: Student) => {
       const matchesSearch =
-        student.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.nickname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.roll?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.hobby?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.mobileNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+        student.fullName?.toLowerCase().includes(normalizedSearchTerm) ||
+        student.nickname?.toLowerCase().includes(normalizedSearchTerm) ||
+        student.email?.toLowerCase().includes(normalizedSearchTerm) ||
+        student.roll?.toLowerCase().includes(normalizedSearchTerm) ||
+        student.hobby?.toLowerCase().includes(normalizedSearchTerm) ||
+        student.mobileNumber?.toLowerCase().includes(normalizedSearchTerm);
 
       return matchesSearch;
     });
-
-    setFilteredData(filtered);
-  };
+  }, [allStudents, searchTerm]);
 
   return (
     <div className="min-h-[calc(100vh-64px)] p-4">
@@ -78,6 +59,12 @@ export default function StudentManager() {
           setSearchTerm={setSearchTerm}
           filteredData={filteredData}
         />
+
+        {isError && (
+          <p className="mb-4 text-center text-sm text-red-600">
+            Failed to load profiles. Please try again later.
+          </p>
+        )}
 
         {/* Profiles Grid */}
         <ProfilePageProfileGrid

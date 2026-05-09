@@ -2,9 +2,11 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { CreateProfilePage } from "../../components/CreateProfilePage";
 import { createUser } from "../../../util/Database";
+import { queryKeys } from "../../../util/queryKeys";
 import { Student } from "../../../types/Student";
 
 import toast from "react-hot-toast";
@@ -30,10 +32,22 @@ export default function Page() {
     createdAt: Date.now(),
     roll: "",
   });
-  const [createLoading, setCreateLoading] = useState(false);
   // const [imageUploadLoading, setImageUploadLoading] = useState(false);
 
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const createProfileMutation = useMutation({
+    mutationFn: createUser,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.students });
+      toast.success("Profile created successfully");
+      router.push("/profiles");
+    },
+    onError: () => {
+      toast.error("Profile creation failed");
+    },
+  });
 
   const handleCreateProfile = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,21 +61,7 @@ export default function Page() {
       toast.error("Full name, email, pincode, roll, and section are required");
       return;
     }
-    setCreateLoading(true);
-    try {
-      const response = await createUser(studentInfo);
-      if (!response) {
-        toast.error("Profile creation failed");
-        setCreateLoading(false);
-        return;
-      }
-      toast.success("Profile created successfully");
-      router.push("/profiles");
-    } catch (error) {
-      toast.error("Profile creation failed");
-    } finally {
-      setCreateLoading(false);
-    }
+    createProfileMutation.mutate(studentInfo);
   };
 
   // const handleImageUpload = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -107,7 +107,7 @@ export default function Page() {
         studentInfo={studentInfo}
         setStudentInfo={setStudentInfo}
         handleCreateProfile={handleCreateProfile}
-        createLoading={createLoading}
+        createLoading={createProfileMutation.isPending}
         // handleImageUpload={handleImageUpload}
         // imageUploadLoading={imageUploadLoading}
       />

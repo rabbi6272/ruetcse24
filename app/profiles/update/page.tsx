@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import toast from "react-hot-toast";
 
 import { deleteUser, getUserByEmail, updateUser } from "../../../util/Database";
+import { queryKeys } from "../../../util/queryKeys";
 
 import type { Student } from "../../../types/Student";
 
@@ -33,6 +35,7 @@ export default function ProfileUpdatePage() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   // Zustand store
   const updateStudentInStore = useStudentStore((state) => state.updateStudent);
@@ -136,6 +139,7 @@ export default function ProfileUpdatePage() {
       setProfileData(updated);
       // Update the store to reflect changes in the profiles page
       updateStudentInStore(updated.id, updated);
+      queryClient.invalidateQueries({ queryKey: queryKeys.students });
       toast.success("Profile updated successfully!");
     } catch (err) {
       console.error("Profile update failed:", err);
@@ -174,6 +178,7 @@ export default function ProfileUpdatePage() {
       }
 
       deleteStudentFromStore(profileData.id);
+      queryClient.invalidateQueries({ queryKey: queryKeys.students });
       toast.success("Account deleted");
       handleLogout();
     } catch (err) {
@@ -242,6 +247,7 @@ export default function ProfileUpdatePage() {
       setProfileData(updated);
       // Update the store to reflect changes in the profiles page
       updateStudentInStore(updated.id, updated);
+      queryClient.invalidateQueries({ queryKey: queryKeys.students });
 
       if (previousPublicId && previousPublicId !== publicId) {
         const deletedPreviousImage = await deleteProfileImage(previousPublicId);

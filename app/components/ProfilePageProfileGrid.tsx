@@ -13,7 +13,7 @@ export function ProfilePageProfileGrid({
 }) {
   if (studentsLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-4">
         {Array.from({ length: 8 }).map((_, index) => (
           <Skeleton
             key={index}
@@ -27,7 +27,7 @@ export function ProfilePageProfileGrid({
   return (
     <div
       id="profilesContainer"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-4"
     >
       {filteredData.length !== 0 ? (
         filteredData.map((student, index) => (
