@@ -26,6 +26,11 @@ export default function StudentManager() {
     try {
       setStudentsLoading(true);
       const res = await getAllUsers();
+      res.sort((a, b) => {
+        const rollA = a.roll;
+        const rollB = b.roll;
+        return rollA.localeCompare(rollB);
+      });
       setAllStudents(res);
     } catch (error) {
       console.error("Error fetching users:", error);
