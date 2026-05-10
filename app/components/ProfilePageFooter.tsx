@@ -6,7 +6,13 @@ export function ProfilePageFooter() {
       <span className="text-gray-600">
         <i className="far fa-copyright"></i>
         All Reserved by
-        <span className="text-blue-500 font-semibold ml-1">RUET CSE 24</span>
+        <Link
+          href="https://ruetcsearchive.app/contact&help/developers"
+          target="_blank"
+          className="text-blue-500 font-semibold ml-1"
+        >
+          RUET CSE 24
+        </Link>
       </span>
 
       <Link

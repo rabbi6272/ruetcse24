@@ -33,7 +33,7 @@ export async function createUser(
 
 export async function getAllUsers(): Promise<Student[]> {
   const snaps = await getDocs(collection(db, USERS_COLLECTION));
-  if (snaps.empty) throw new Error("Document does not exist");
+  if (snaps.empty) return [];
   const users: Student[] = [];
   snaps.forEach((docSnap) => {
     users.push(docToStudent(docSnap.data() as DocumentData, docSnap.id));

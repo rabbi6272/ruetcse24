@@ -1,30 +1,17 @@
 "use server";
 
 import { Resend } from "resend";
-import { allEmails } from "../static/emails";
 import { EmailBody } from "./EmailBody";
 
 export async function sendEmailAction(
-  recipientIndices: number | number[],
+  recipients: string[] | string,
   emailSubject: string = "Update from RUET CSE 24",
   emailContent: string = "",
 ) {
   try {
-    const indices = Array.isArray(recipientIndices)
-      ? recipientIndices
-      : [recipientIndices];
-    const recipients = indices
-      .map((idx) => allEmails[idx])
-      .filter((email) => email);
-
-    if (recipients.length === 0) {
-      return {
-        success: false,
-        message: "No valid recipients found",
-        error: "Invalid recipient indices",
-      };
-    }
-
+    console.log("Sending email to:", recipients);
+    console.log("Email subject:", emailSubject);
+    console.log("Email content:", emailContent);
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: "RUET CSE 24 <noreply@mail.ruetcsearchive.app>",

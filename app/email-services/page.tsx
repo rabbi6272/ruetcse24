@@ -1,11 +1,14 @@
 "use client";
 
 import { sendEmailAction } from "./emailAction";
-import { allEmails } from "../static/emails";
-import { FormEvent, useState, ChangeEvent } from "react";
+import { FormEvent, useEffect, useState, ChangeEvent } from "react";
+import { getAllUsers } from "../../util/Database";
+import { allEmails as fallbackEmails } from "../static/emails";
 
 export default function EmailServices() {
+  const [allEmails, setAllEmails] = useState<string[]>(fallbackEmails);
   const [loading, setLoading] = useState(false);
+  const [recipientsLoading, setRecipientsLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [sendMode, setSendMode] = useState<"single" | "all">("single");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -14,16 +17,56 @@ export default function EmailServices() {
   );
   const [emailContent, setEmailContent] = useState("");
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRecipients() {
+      try {
+        const users = await getAllUsers();
+        const emails = users
+          .map((user) => user.email)
+          .filter((email): email is string => !!email);
+
+        if (!cancelled && emails.length > 0) {
+          setAllEmails(emails);
+        }
+      } catch (error) {
+        console.error("Failed to load email recipients:", error);
+      } finally {
+        if (!cancelled) {
+          setRecipientsLoading(false);
+        }
+      }
+    }
+
+    loadRecipients();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
     try {
-      const recipients =
-        sendMode === "all"
-          ? Array.from({ length: allEmails.length }, (_, i) => i)
-          : [selectedIndex];
+      const recipients: string[] = [];
+
+      if (sendMode === "all") {
+        recipients.push(...allEmails);
+      } else if (sendMode === "single") {
+        const email = allEmails[selectedIndex];
+        if (email) {
+          recipients.push(email);
+        }
+      }
+
+      if (recipients.length === 0) {
+        setMessage("✗ Please select at least one recipient.");
+        return;
+      }
 
       const result = await sendEmailAction(
         recipients,
@@ -51,7 +94,7 @@ export default function EmailServices() {
     >
       <h1 className="text-4xl font-bold mb-2">Email Services</h1>
 
-      <div className="w-full max-w-md bg-white p-5 rounded-lg shadow-lg">
+      <div className="w-full max-w-lg bg-white p-5 rounded-lg shadow-lg">
         {/* Send Mode Selection */}
         <div className="mb-4">
           <label className="block text-sm font-semibold mb-3">
@@ -105,7 +148,7 @@ export default function EmailServices() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {allEmails.map((email, idx) => (
-                <option key={idx} value={idx}>
+                <option key={email} value={idx}>
                   {idx}: {email}
                 </option>
               ))}
@@ -167,6 +210,12 @@ export default function EmailServices() {
         </div> */}
 
         {/* Message Display */}
+        {recipientsLoading && (
+          <p className="text-xs text-center mb-2 text-gray-500">
+            Refreshing recipients...
+          </p>
+        )}
+
         {message && (
           <p
             className={`text-sm text-center mb-2 px-3 py-2 rounded-full ${
@@ -182,7 +231,7 @@ export default function EmailServices() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || allEmails.length === 0}
           className="w-full bg-blue-500 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-full transition duration-200"
         >
           {loading
