@@ -18,7 +18,7 @@ export function ProfilePageProfileGrid({
           <Skeleton
             key={index}
             animationType="shimmer"
-            className="h-60 w-full rounded-lg bg-white"
+            className="h-100 w-full rounded-lg bg-white"
           />
         ))}
       </div>

@@ -18,3 +18,5 @@ export interface Student {
   createdAt: number;
   updatedAt?: number;
 }
+
+export type SectionFilter = "All" | "a" | "b" | "c";

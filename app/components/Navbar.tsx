@@ -16,16 +16,16 @@ export function Navbar() {
       </Link>
 
       <div className="sm:space-x-1 md:space-x-2 lg:space-x-3 xl:space-x-4">
-        <Link
+        {/* <Link
           href={"/profiles/create"}
           className="px-4 py-1.5 rounded-full hover:bg-gray-200 transition-colors duration-300"
         >
           {" "}
           Create
-        </Link>
+        </Link> */}
         <Link
           href={"/profiles/update"}
-          className="px-4 py-1.5 rounded-full hover:bg-gray-200 transition-colors duration-300"
+          className="px-4 py-1.5 font-medium rounded-full hover:bg-gray-200 transition-colors duration-300"
         >
           Update
         </Link>
