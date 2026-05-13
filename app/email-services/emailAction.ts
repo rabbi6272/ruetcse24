@@ -9,9 +9,6 @@ export async function sendEmailAction(
   emailContent: string = "",
 ) {
   try {
-    console.log("Sending email to:", recipients);
-    console.log("Email subject:", emailSubject);
-    console.log("Email content:", emailContent);
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: "RUET CSE 24 <noreply@mail.ruetcsearchive.app>",

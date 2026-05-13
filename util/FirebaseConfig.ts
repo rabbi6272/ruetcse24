@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,13 +16,24 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 if (typeof window !== "undefined") {
   import("firebase/app-check").then(
     ({ initializeAppCheck, ReCaptchaV3Provider }) => {
-      initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(
-          "6LcO7aYsAAAAAP-IPs5gALP0XxwlG-KqgLUsgb_k",
-        ),
-      });
+      try {
+        initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(
+            "6LcO7aYsAAAAAP-IPs5gALP0XxwlG-KqgLUsgb_k",
+          ),
+          isTokenAutoRefreshEnabled: true,
+        });
+      } catch {
+        // App Check may already be initialized during fast refresh.
+      }
     },
   );
 }
 
-export const db = getFirestore(app);
+export const db =
+  typeof window === "undefined"
+    ? getFirestore(app)
+    : initializeFirestore(app, {
+        // Helps in restrictive networks where Firestore streaming fails.
+        experimentalAutoDetectLongPolling: true,
+      });

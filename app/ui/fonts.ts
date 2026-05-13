@@ -16,6 +16,8 @@ export const changaone = LocalFont({
 export const nunito = Nunito({
   display: "swap",
   preload: true,
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const lato = Lato({

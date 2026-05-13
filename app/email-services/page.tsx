@@ -3,10 +3,10 @@
 import { sendEmailAction } from "./emailAction";
 import { FormEvent, useEffect, useState, ChangeEvent } from "react";
 import { getAllUsers } from "../../util/Database";
-import { allEmails as fallbackEmails } from "../static/emails";
+import { AllEmails } from "../../util/AllEmails";
 
 export default function EmailServices() {
-  const [allEmails, setAllEmails] = useState<string[]>(fallbackEmails);
+  const [allEmails, setAllEmails] = useState<string[]>(AllEmails);
   const [loading, setLoading] = useState(false);
   const [recipientsLoading, setRecipientsLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -16,35 +16,6 @@ export default function EmailServices() {
     "Your Personalized Update from RUET CSE 24",
   );
   const [emailContent, setEmailContent] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadRecipients() {
-      try {
-        const users = await getAllUsers();
-        const emails = users
-          .map((user) => user.email)
-          .filter((email): email is string => !!email);
-
-        if (!cancelled && emails.length > 0) {
-          setAllEmails(emails);
-        }
-      } catch (error) {
-        console.error("Failed to load email recipients:", error);
-      } finally {
-        if (!cancelled) {
-          setRecipientsLoading(false);
-        }
-      }
-    }
-
-    loadRecipients();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
