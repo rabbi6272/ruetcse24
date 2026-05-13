@@ -111,7 +111,6 @@ const names = [
   "AYMAN",
   "BRISTY",
   "MAHADI",
-  "SUMON",
   "IMRUL",
   "PRANTO",
   "MUKIT",
@@ -433,11 +432,12 @@ export default function Page(): React.ReactElement {
       {/* Main Container */}
       <div className={`${anonymous.className} w-full p-2.5 text-center`}>
         <Image
-          src="/l.png"
+          src="/RuetLogo.png"
           alt="RUET Logo"
           width={200}
           height={200}
           loading="eager"
+          priority
           className="mx-auto h-auto w-auto animate-image-fade-in"
         />
 

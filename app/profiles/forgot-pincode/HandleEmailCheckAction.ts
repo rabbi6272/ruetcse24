@@ -1,10 +1,10 @@
 "use server";
 
-import crypto from "crypto";
 import { Resend } from "resend";
+import crypto from "crypto";
+
 import { AllEmails } from "../../../util/AllEmails";
 import { ForgotPinEmailBody } from "./ForgotPinEmailBody";
-import { getUserByEmail, updateUser } from "../../../util/Database";
 
 const OTP_EXPIRY_SECONDS = 5 * 60;
 const VERIFIED_TOKEN_EXPIRY_SECONDS = 10 * 60;
@@ -192,57 +192,4 @@ function parseVerifiedToken(token: string): {
     return null;
   }
   return payload;
-}
-
-export async function updatePincodeAfterVerification(
-  email: string,
-  newPincode: string,
-  confirmedPincode: string,
-  verifiedToken: string,
-): Promise<ActionResult> {
-  const cleanEmail = email.trim().toLowerCase();
-  const parsed = parseVerifiedToken(verifiedToken);
-  if (!parsed) {
-    return {
-      ok: false,
-      message: "Invalid verification session. Verify OTP again.",
-    };
-  }
-  if (Date.now() > parsed.expiresAt) {
-    return { ok: false, message: "Verification expired. Verify OTP again." };
-  }
-  if (parsed.email !== cleanEmail) {
-    return { ok: false, message: "Email mismatch. Verify OTP again." };
-  }
-
-  const pin = newPincode.trim();
-  const confirmPin = confirmedPincode.trim();
-  if (!pin || !confirmPin) {
-    return { ok: false, message: "Both pincode fields are required." };
-  }
-  if (pin !== confirmPin) {
-    return { ok: false, message: "Pincodes do not match." };
-  }
-
-  try {
-    const user = await getUserByEmail(cleanEmail);
-    if (!user) {
-      return { ok: false, message: "No account found with this email." };
-    }
-    user.pincode = pin;
-    const updated = await updateUser(user.id, user);
-    if (!updated) {
-      return {
-        ok: false,
-        message: "Failed to update pincode. Please try again.",
-      };
-    }
-    return { ok: true, message: "Pincode updated successfully." };
-  } catch (error) {
-    console.error("Pincode update failed:", error);
-    return {
-      ok: false,
-      message: "Something went wrong while updating pincode.",
-    };
-  }
 }

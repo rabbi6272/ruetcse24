@@ -6,11 +6,9 @@ import { useRouter } from "next/navigation";
 
 import { VerifyOTPForm } from "./OTPInput";
 import { CheckEmailForm } from "./EmailInputForm";
-import {
-  handleEmailCheck,
-  updatePincodeAfterVerification,
-  verifyOtp,
-} from "./HandleEmailCheckAction";
+import { handleEmailCheck, verifyOtp } from "./HandleEmailCheckAction";
+import { getUserByEmail, updateUser } from "../../../util/Database";
+import { Spinner } from "@heroui/react";
 
 export function CheckEmailAndVerifyOTPForm() {
   const router = useRouter();
@@ -63,31 +61,56 @@ export function CheckEmailAndVerifyOTPForm() {
     }
   }
 
-  async function handlePincodeReset(e: React.FormEvent<HTMLFormElement>) {
+  async function handleResetPincode(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setResetLoading(true);
+    if (!verifiedToken) {
+      toast.error("OTP Verification required.");
+      return;
+    }
+
+    if (!newPincode) {
+      toast.error("Please enter a new pincode.");
+      return;
+    }
+
+    if (!confirmPincode) {
+      toast.error("Please confirm your new pincode.");
+      return;
+    }
+
+    if (newPincode !== confirmPincode) {
+      toast.error("The pincodes do not match.");
+      return;
+    }
+
     try {
-      const result = await updatePincodeAfterVerification(
-        email,
-        newPincode,
-        confirmPincode,
-        verifiedToken,
-      );
-      if (!result.ok) {
-        toast.error(result.message);
+      const cleanEmail = email.trim().toLowerCase();
+      const res = await getUserByEmail(cleanEmail);
+      if (!res) {
+        toast.error("No account found with this email.");
+        setResetLoading(false);
         return;
       }
-      toast.success(result.message);
-      setShowResetModal(false);
-      router.push("/profiles");
-    } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong. Please try again.");
+
+      const updatedUser = await updateUser(res.id, { pincode: newPincode });
+      if (updatedUser) {
+        toast.success("Pincode updated successfully.");
+        setResetLoading(false);
+        router.push("/profiles");
+        return;
+      } else {
+        toast.error("Failed to update pincode. Please try again.");
+        setResetLoading(false);
+        return;
+      }
+    } catch (err) {
+      toast.error("An error occurred while fetching user data.");
+      setResetLoading(false);
+      return;
     } finally {
       setResetLoading(false);
     }
   }
-
   return (
     <>
       <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
@@ -123,7 +146,7 @@ export function CheckEmailAndVerifyOTPForm() {
               <p>Step 3: Submit to update your account.</p>
             </div>
 
-            <form onSubmit={handlePincodeReset} className="mt-5 space-y-3">
+            <form onSubmit={handleResetPincode} className="mt-5 space-y-3">
               <input
                 type="password"
                 value={newPincode}
@@ -154,6 +177,7 @@ export function CheckEmailAndVerifyOTPForm() {
                   disabled={resetLoading}
                   className="w-1/2 bg-indigo-500 text-white py-2.5 rounded-full hover:bg-indigo-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
+                  {resetLoading && <Spinner size="sm" color="current" />}
                   {resetLoading ? "Updating..." : "Update Pincode"}
                 </button>
               </div>

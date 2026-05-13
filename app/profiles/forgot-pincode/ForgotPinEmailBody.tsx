@@ -32,8 +32,9 @@ export function ForgotPinEmailBody({ otp }: { otp: string }) {
             {/* ── Highlighted callout block ── */}
             <Section style={callout}>
               <Text style={calloutText}>
-                Here is Your OTP for updating your pincode: <br />
-                <strong>{otp}</strong> <br />
+                We received a request to reset your pincode. Your One-Time
+                Password (OTP) is: <br />
+                <Text style={otpText}>{otp}</Text> <br />
                 Please use this OTP to reset your pincode and regain access to
                 your account. If you did not request this, please ignore this
                 email.
@@ -126,16 +127,11 @@ const calloutText: React.CSSProperties = {
   margin: 0,
 };
 
-const button: React.CSSProperties = {
-  backgroundColor: "#1a7a8a",
-  color: "#ffffff",
-  padding: "12px 28px",
-  borderRadius: "50px",
-  fontSize: "15px",
-  fontWeight: "600",
-  textDecoration: "none",
+const otpText: React.CSSProperties = {
   display: "inline-block",
-  marginTop: "8px",
+  fontSize: "18px",
+  fontWeight: "600",
+  padding: "6px 12px",
 };
 
 const divider: React.CSSProperties = {
