@@ -71,7 +71,7 @@ export default function StudentManager() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl 2xl:max-w-337.5 mx-auto">
         {/* Header */}
         <ProfilePageHeader />
 

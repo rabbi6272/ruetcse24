@@ -25,7 +25,7 @@ export function ProfileCard({
     >
       {/* Blood Group */}
       <div
-        className={`absolute top-2 right-2 px-2 py-1 rounded-full bg-[#e0e7ff] z-9 text-[10px] `}
+        className={`text-gray-700 absolute top-2 right-2 px-2 py-1 rounded-full bg-[#e0e7ff] z-9 text-[10px] `}
         data-name="BloodGroupContainer"
       >
         <i className="fas fa-droplet text-red-500"></i>
@@ -34,7 +34,7 @@ export function ProfileCard({
 
       {/* Roll Number */}
       <div
-        className={`absolute top-2 left-2 px-2 py-1 rounded-full bg-[#e0e7ff] z-9 text-[10px] `}
+        className={`text-gray-700 absolute top-2 left-2 px-2 py-1 rounded-full bg-[#e0e7ff] z-9 text-[10px] `}
         data-name="RollNumberContainer"
       >
         <span data-name="RollNumber">{roll || "2403..."}</span>
@@ -88,7 +88,7 @@ export function ProfileCard({
         <div className="mt-4 space-y-3 text-gray-400 pt-2 border-t border-gray-300">
           {/* Bio */}
           <div
-            className=" flex items-start gap-2 text-gray-500"
+            className=" flex items-start gap-2 text-gray-400"
             data-name="bioContainer"
           >
             <i className="fas fa-quote-left h-4 w-4"></i>
@@ -111,7 +111,7 @@ export function ProfileCard({
             className="flex items-center justify-center text-md"
             data-name="mobileNumberContainer"
           >
-            <i className="fas fa-phone mr-1.5 h-4 w-4 text-green-400"></i>
+            <i className="fas fa-phone mr-1.5 h-4 w-4 text-gray-400"></i>
             <span data-name="mobileNumber">
               {mobileNumber || "Mobile number not provided"}
             </span>
@@ -123,7 +123,7 @@ export function ProfileCard({
             data-name="hobbyContainer"
           >
             <span className="flex items-center text-md">
-              <i className="fas fa-fire h-4 w-4 mr-1 text-red-400"></i>
+              <i className="fas fa-fire h-4 w-4 mr-1 text-gray-400"></i>
               <span data-name="hobby">{hobby || "No hobby specified"}</span>
             </span>
           </div>
@@ -140,7 +140,7 @@ export function ProfileCard({
               className=" hover:underline flex items-center"
               data-name="fbProfile"
             >
-              <i className="fab fa-facebook h-4 w-4 mr-1 text-blue-400"></i>
+              <i className="fab fa-facebook h-4 w-4 mr-1 text-gray-400"></i>
               &nbsp; Facebook Profile
             </Link>
           </div>
