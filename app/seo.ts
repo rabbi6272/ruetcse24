@@ -7,17 +7,29 @@ export const siteConfig = {
   shortName: "CSE-24",
   description:
     "The official digital home and student profile directory for the RUET Computer Science and Engineering 2024 batch.",
+  tagline:
+    "Student profile directory and batch archive for Rajshahi University of Engineering and Technology CSE 2024.",
   url: process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteUrl,
   ogImage: "/icon.png",
-  logo: "/l.png",
+  logo: "/RuetLogo.png",
+  contactPage: "https://ruetcsearchive.app/contact&help/developers",
+  facebookPage:
+    "https://m.facebook.com/profile.php?id=61574730479807&name=xhp_nt__fb__action__open_user",
+  email: "ruetcse24@gmail.com",
   keywords: [
     "RUET CSE 24",
     "RUET CSE",
     "RUET Computer Science and Engineering",
     "Rajshahi University of Engineering and Technology",
+    "RUET students",
+    "RUET batch",
+    "RUET profile",
+    "RUET student directory",
     "CSE 2024 batch",
     "RUET student profiles",
     "RUET CSE directory",
+    "RUET CSE 24 batch",
+    "Rajshahi University CSE",
   ],
 };
 

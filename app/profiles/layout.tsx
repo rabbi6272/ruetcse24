@@ -4,7 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { createMetadata } from "../seo";
 
 export const metadata: Metadata = createMetadata({
-  title: "Student Profiles",
+  title: "RUET Student Profiles",
   description:
     "Browse the RUET CSE 24 student profile directory by name, roll, section, email, and contact information.",
   path: "/profiles",

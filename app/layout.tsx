@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   creator: siteConfig.name,
   publisher: siteConfig.name,
   category: "education",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  referrer: "origin-when-cross-origin",
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
@@ -50,6 +56,23 @@ export default function RootLayout({
       name: siteConfig.name,
       logo: new URL(siteConfig.logo, siteUrl).toString(),
     },
+    about: {
+      "@type": "CollegeOrUniversity",
+      name: "Rajshahi University of Engineering and Technology",
+      alternateName: "RUET",
+    },
+  };
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteConfig.name,
+    alternateName: "RUET CSE 24 Batch",
+    url: siteConfig.url,
+    logo: new URL(siteConfig.logo, siteUrl).toString(),
+    email: siteConfig.email,
+    sameAs: [siteConfig.facebookPage, siteConfig.contactPage],
+    keywords: siteConfig.keywords.join(", "),
   };
 
   return (
@@ -66,6 +89,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
         />
       </head>
       <body className={`${lato.className}`}>

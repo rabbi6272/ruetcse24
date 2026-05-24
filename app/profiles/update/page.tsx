@@ -280,7 +280,7 @@ export default function ProfileUpdatePage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-3 md:p-6 xl:p-8">
+    <section className="min-h-[calc(100vh-64px)] flex items-center justify-center p-3 md:p-6 xl:p-8">
       {!isLoggedIn ? (
         <LoginPage
           handleLogin={handleLogin}
@@ -303,6 +303,6 @@ export default function ProfileUpdatePage() {
           deleteLoading={deleteLoading}
         />
       )}
-    </div>
+    </section>
   );
 }
