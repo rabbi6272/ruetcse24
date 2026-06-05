@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
+import sharp from "sharp";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -39,8 +40,13 @@ export async function POST(request: Request) {
     // Convert file to buffer
     const buffer = await fileToBuffer(file);
 
+    const optimizedBuffer = await sharp(buffer)
+      .resize({ width: 1920, height: 1920, fit: "inside" })
+      .toFormat("webp", { quality: 80 })
+      .toBuffer();
+
     // Upload to Cloudinary
-    const result = await uploadToCloudinary(buffer);
+    const result = await uploadToCloudinary(optimizedBuffer);
 
     return NextResponse.json(
       {
@@ -73,13 +79,6 @@ function uploadToCloudinary(buffer: Buffer): Promise<any> {
       {
         folder: "Users",
         resource_type: "image",
-        // Optimizations
-        transformation: [
-          {
-            quality: "auto:good", // Automatic quality optimization
-            fetch_format: "auto", // Automatic format selection (WebP for supported browsers)
-          },
-        ],
       },
       (error, result) => {
         if (error) {

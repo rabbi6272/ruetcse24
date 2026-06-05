@@ -1,5 +1,5 @@
 import { SquarePen } from "lucide-react";
-import { Button, Input, Modal, ModalBackdrop } from "@heroui/react";
+import { Button, Input, Modal, ModalBackdrop, Spinner } from "@heroui/react";
 
 export function ImageUploadModal({
   handleImageUpload,
@@ -52,7 +52,7 @@ export function ImageUploadModal({
               >
                 {imageUploadLoading ? "Uploading..." : "Upload"}
                 {imageUploadLoading && (
-                  <div className="loader border-4 border-gray-200 h-5 w-5 ml-2 rounded-full"></div>
+                  <Spinner className="ml-2" size="sm" color="current" />
                 )}
               </Button>
             </Modal.Footer>

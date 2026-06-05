@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function Navbar() {
   return (
-    <nav className="h-16 w-full sticky top-0 z-999 bg-white/40 text-gray-600 px-4 md:px-6 lg:px-8 xl:px-12 backdrop-blur-md shadow-sm flex items-center justify-between">
+    <nav className="h-16 w-full sticky top-0 z-99 bg-white/40 text-gray-600 px-4 md:px-6 lg:px-8 xl:px-12 backdrop-blur-md shadow-sm flex items-center justify-between">
       <Link href={"/"}>
         <Image
           src={"/TitleIcon.png"}

@@ -12,18 +12,13 @@ cloudinary.config({
 
 export async function DELETE(request: Request) {
   try {
-    const { publicId, studentId, pincode } = await request.json();
+    const { publicId } = await request.json();
 
-    if (!publicId || !studentId || !pincode) {
+    if (!publicId) {
       return NextResponse.json(
-        { error: "PublicId, studentId, and pincode are required" },
+        { error: "PublicId is required" },
         { status: 400 },
       );
-    }
-
-    const studentSnap = await getDoc(doc(db, "users", studentId));
-    if (!studentSnap.exists() || studentSnap.data().pincode !== pincode) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Remove file extension if present

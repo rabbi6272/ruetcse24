@@ -14,6 +14,7 @@ import { LoginPage } from "../../components/LoginPage";
 import { StudentPortalPage } from "../../components/StudentPortalPage";
 
 import { useStudentStore } from "../../../store/StudentStore";
+import imageCompression from "browser-image-compression";
 
 // Maximum file size (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -216,6 +217,13 @@ export default function ProfileUpdatePage() {
     try {
       setImageUploadLoading(true);
 
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      });
+      formData.set("profile", compressedFile);
+
       const previousPublicId = profileData?.profilePicture?.publicId;
 
       // Upload new image
@@ -269,9 +277,7 @@ export default function ProfileUpdatePage() {
     const response = await fetch("/api/profiles/delete-image", {
       method: "DELETE",
       body: JSON.stringify({
-        publicId,
-        studentId: profileData.id,
-        pincode: profileData.pincode,
+        publicId: publicId,
       }),
       headers: { "Content-Type": "application/json" },
     });
