@@ -20,11 +20,15 @@ export function LoginPage({
   loginLoading: boolean;
 }) {
   return (
-    <section className="flex items-center justify-center gap-16 px-4 py-8">
-      <aside className="hidden md:block max-w-[40%]">
-        <Image src={login} alt="Login Image" className="pr-6 lg:pr-10 xl:pr-14" />
+    <section className="w-full flex items-center justify-center gap-16 px-4 py-8">
+      <aside className="hidden md:block lg:max-w-[40%] 2xl:max-w-[35%]">
+        <Image
+          src={login}
+          alt="Login Image"
+          className="pr-6 lg:pr-10 xl:pr-14"
+        />
       </aside>
-      <aside className="flex-1 bg-white rounded-2xl shadow hover:shadow-lg p-6 w-full max-w-md">
+      <aside className="w-full md:flex-1 bg-white rounded-2xl shadow hover:shadow-lg p-6 md:max-w-md">
         <h1 className="text-2xl text-gray-800 text-center mb-6">
           Login to Your Account
         </h1>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { useSession, signIn, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 
 import { deleteUser, getUserByEmail, updateUser } from "../../../util/Database";
@@ -14,6 +14,7 @@ import { LoginPage } from "../../components/LoginPage";
 import { StudentPortalPage } from "../../components/StudentPortalPage";
 
 import { useStudentStore } from "../../../store/StudentStore";
+
 import imageCompression from "browser-image-compression";
 
 // Maximum file size (5MB)
@@ -26,8 +27,9 @@ const ALLOWED_IMAGE_TYPES = [
 ];
 
 export default function ProfileUpdatePage() {
+  const { data: session, status } = useSession();
+
   // Auth state
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPincode, setLoginPincode] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
@@ -65,21 +67,39 @@ export default function ProfileUpdatePage() {
     createdAt: Date.now(),
   });
 
+  // Load user data once session is established
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.email) {
+      const loadUser = async () => {
+        try {
+          const user = await getUserByEmail(session.user.email as string);
+          if (user) {
+            setProfileData(user);
+          }
+        } catch (error) {
+          toast.error("Failed to load profile data.");
+        }
+      };
+      loadUser();
+    }
+  }, [session, status]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
 
     try {
-      const user = await getUserByEmail(loginEmail);
-      if (!user || user.pincode !== loginPincode) {
-        toast.error("Invalid email or pincode");
-        setLoginLoading(false);
-        return;
-      }
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: loginEmail,
+        pincode: loginPincode,
+      });
 
-      setIsLoggedIn(true);
-      setProfileData(user);
-      toast.success("Login successful!");
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Login successful!");
+      }
     } catch (err) {
       toast.error("Login failed");
     } finally {
@@ -87,9 +107,8 @@ export default function ProfileUpdatePage() {
     }
   };
 
-  // Handle logout
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
     setLoginEmail("");
     setLoginPincode("");
     setProfileData({
@@ -113,18 +132,11 @@ export default function ProfileUpdatePage() {
     });
   };
 
-  // Handle profile update
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setUpdateLoading(true);
 
-    if (!profileData) {
-      toast.error("No profile data found.");
-      setUpdateLoading(false);
-      return;
-    }
-
-    if (!profileData.id) {
+    if (!profileData || !profileData.id) {
       toast.error("Profile is missing an ID. Please login again.");
       setUpdateLoading(false);
       return;
@@ -138,7 +150,6 @@ export default function ProfileUpdatePage() {
         return;
       }
       setProfileData(updated);
-      // Update the store to reflect changes in the profiles page
       updateStudentInStore(updated.id, updated);
       queryClient.invalidateQueries({ queryKey: queryKeys.students });
       toast.success("Profile updated successfully!");
@@ -150,12 +161,9 @@ export default function ProfileUpdatePage() {
     }
   };
 
-  // Handle account deletion
   const handleDeleteAccount = async () => {
-    if (!profileData || deleteLoading) return;
-
-    if (!profileData.id) {
-      toast.error("Profile is missing an ID. Please login again.");
+    if (!profileData || deleteLoading || !profileData.id) {
+      if (!profileData.id) toast.error("Profile is missing an ID. Please login again.");
       return;
     }
 
@@ -190,7 +198,6 @@ export default function ProfileUpdatePage() {
     }
   };
 
-  // Handle image upload
   const handleImageUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (imageUploadLoading) return;
@@ -208,7 +215,6 @@ export default function ProfileUpdatePage() {
       return;
     }
 
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       toast.error("File size exceeds 5MB limit");
       return;
@@ -226,7 +232,6 @@ export default function ProfileUpdatePage() {
 
       const previousPublicId = profileData?.profilePicture?.publicId;
 
-      // Upload new image
       const response = await fetch("/api/profiles/upload-image", {
         method: "POST",
         body: formData,
@@ -253,7 +258,6 @@ export default function ProfileUpdatePage() {
       }
 
       setProfileData(updated);
-      // Update the store to reflect changes in the profiles page
       updateStudentInStore(updated.id, updated);
       queryClient.invalidateQueries({ queryKey: queryKeys.students });
 
@@ -276,18 +280,19 @@ export default function ProfileUpdatePage() {
   const deleteProfileImage = async (publicId: string) => {
     const response = await fetch("/api/profiles/delete-image", {
       method: "DELETE",
-      body: JSON.stringify({
-        publicId: publicId,
-      }),
+      body: JSON.stringify({ publicId }),
       headers: { "Content-Type": "application/json" },
     });
-
     return response.ok;
   };
 
+  if (status === "loading") {
+    return <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <section className="min-h-[calc(100vh-64px)] flex items-center justify-center p-3 md:p-6 xl:p-8">
-      {!isLoggedIn ? (
+      {status !== "authenticated" ? (
         <LoginPage
           handleLogin={handleLogin}
           loginEmail={loginEmail}

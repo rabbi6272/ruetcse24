@@ -19,7 +19,7 @@ export function ImageUploadModal({
       </Button>
 
       <ModalBackdrop variant={"blur"}>
-        <Modal.Container>
+        <Modal.Container placement="center">
           <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>Update Profile Picture</Modal.Heading>
